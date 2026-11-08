@@ -1,74 +1,32 @@
 # MLT-4 and MLT-5 tests
 
-This directory contains local tests for the WAV reader (`audio_io`, MLT-4)
-and the signal-processing package (`signal_proc`, MLT-5). Reader tests create
-real temporary WAV files. The integration case passes a decoded `AudioPacket`
-to the real DSP implementation and checks a 440 Hz tone and its amplitude.
+Тести навмисно залишені компактними: перевіряються основні сценарії, потрібні
+для модуля MLT-4, без великої кількості рідкісних крайових випадків.
 
-The suite contains **43 collected pytest cases**: 31 reader cases, 2 command-line
-cases, and the existing 10 DSP cases. The all-space-filename regression is
-POSIX-specific and is skipped on Windows, where that filename is not supported.
+У наборі **18 pytest-перевірок**:
+- 6 перевірок читання WAV у `test_audio_io.py`;
+- 2 перевірки консольного запуску в `test_audio_io_cli.py`;
+- 10 наявних перевірок математичного модуля MLT-5 у `test_signal_proc.py`.
 
-## Install and run
+## Що перевіряє MLT-4
 
-From the repository root, activate the project virtual environment, then run:
+1. правильний mono WAV: 8000 Гц, 1 канал, 16 біт, 1 с;
+2. правильний stereo WAV: 16000 Гц, 2 канали, 16 біт, 2 с;
+3. пошкоджений файл між двома правильними не зупиняє останній файл;
+4. порожній файл повертає `empty_audio`;
+5. відсутній файл повертає `read_failed`;
+6. прочитаний WAV передається в реальний MLT-5 і для тону 440 Гц знаходиться пік;
+7. консоль показує параметри правильного файла;
+8. консоль показує помилку середнього файла й усе одно читає наступний.
+
+## Запуск
+
+З кореня проєкту:
 
 ```sh
-source .venv/bin/activate
 python -m pip install -e '.[test]'
-python test/run_tests.py
+python -m pytest test
 ```
 
-The suite uses generated signals and disposable local files. It does not
-access Jira, network services, microphones, or user audio files.
-
-## WAV-reader coverage
-
-`test_audio_io.py` checks mono/stereo metadata and exact samples; PCM8/16/24/32;
-float32/64 and scale preservation; silence and one frame; empty data and
-zero-byte files; malformed/truncated headers and data; unsupported containers
-and encoding; auxiliary chunks; missing paths and directories; same basenames
-with different IDs; empty selection; invalid/duplicate IDs; NaN/Inf; and batch
-continuation after a damaged middle file. WAV bit depth is checked against the
-header, including PCM24 decoded as int32. Original files must remain unchanged.
-
-`test_audio_io_cli.py` checks visible metadata, result order, batch counters,
-and process status after both successful and mixed-result input.
-
-## Test doubles and assertion styles
-
-`test_signal_proc.py` contains a small Butterworth-construction stub and a
-`unittest.mock.Mock` for the SOS filter call. Together they verify the boundary
-between configuration, filter construction, and returned samples without
-replacing the real DSP tests. The suite also uses ordinary `assert`,
-`pytest.approx`, `pytest.raises`, NumPy array assertions, and Mock call
-assertions.
-
-## Coverage
-
-Coverage.py measures statements and branches in `audio_io` and `signal_proc`:
-
-```sh
-python -m coverage run -m pytest test
-python -m coverage report -m
-```
-
-For an annotated HTML report, run `python3 -m coverage html` and open
-`htmlcov/index.html`. Coverage is evidence of executed code paths, not proof of
-correctness by itself; review any missing lines against the test scope.
-
-Result recorded on **2026-11-08** using Python 3.12.14, NumPy 2.3.5,
-SciPy 1.17.0, pytest 9.2.0, and coverage 7.17.2 on Linux:
-
-- Command: `.venv/bin/python -m coverage run -m pytest test`.
-- **43 passed in 2.50 s**.
-- Combined statement/branch coverage: **95%** across `audio_io` and `signal_proc`.
-- `audio_io/reader.py`: 92%; `audio_io/__main__.py`: 94%; `signal_proc/processing.py`: 97%.
-- `audio_contracts` internals are exercised by integration but are not included
-  in this coverage measurement. No claim is made about GUI or worker-pool tests.
-
-The command `.venv/bin/python examples/wav_demo.py` also ran successfully:
-mono loaded, the damaged middle file returned `invalid_wav`, stereo loaded,
-and the zero-byte file returned `empty_audio`; summary: 2 loaded, 2 errors.
-This demo deliberately includes invalid files, so those reported errors are
-the expected behavior.
+Ці вісім перевірок MLT-4 є скороченим набором основних сценаріїв.
+Тести MLT-5 залишені без змін.
