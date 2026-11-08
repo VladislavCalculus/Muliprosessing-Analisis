@@ -167,7 +167,7 @@ Live Jira MLT-14 (`Створити unit-тести`) має status `To Do`, par
 
 На прохання користувача перевірено модульний потік через тимчасовий TCP stream, не додаючи файлів/коду до repository:
 
-- FFmpeg згенерував тимчасовий 1 s PCM16 mono WAV, 8000 Hz, чистий тон 440 Hz.
+- FFmpeg згенерував тимчасовий 1 s PCM16 mono WAV, 8000 Hz, чистий тон 440 Hz. FFmpeg sine filter задає amplitude 1/8 ([офіційна документація](https://ffmpeg.org/ffmpeg-filters.html#sine)); отримане `0.12497339495662549` узгоджується з цим.
 - Terminal 1 викликав `audio_io.read_wav(path, source_id=...)`, отриманий `AudioPacket` серіалізував стандартним `pickle` у stdout і передав через Ncat connect mode.
 - Terminal 2 запустив Ncat listen mode, прочитав той самий pickle зі stdin, викликав `signal_proc.process_signal` і надрукував короткий JSON summary.
 - Ncat loopback endpoint був лише `127.0.0.1`; receiver прийняв 16229 bytes. Фактичний output: `source_id=ncat-loopback-440`, 8000 Hz, 8000 frames, 1 channel, 1.0 s, peak 440 Hz, amplitude `0.12497339495662549`.
