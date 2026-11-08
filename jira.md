@@ -28,6 +28,13 @@
 
 Це підтверджує наявність API-доступу до проєкту й board metadata на вказану дату. Це не є знімком issue status, не доводить, що весь backlog був завантажений, і не змінює дані Jira.
 
+### Спроба отримати Sprint 1 і призначені issues під час аудиту 2026-11-08
+
+- У доступному інструментальному наборі цього запуску немає Jira/Atlassian issue-query tool. Налаштований локальний project-scoped MCP через `python3 .codex/codex-project.py` повернув `Unsupported`; запуск потребує `docker`, але команда `docker` відсутня (`command not found`).
+- Через це live Sprint 1 issue list, assignee та acceptance criteria не отримані. Поточний список задач користувача лишається **невідомим**; не виводити його з DOCX screenshots, старих повідомлень, комітів чи припущень.
+- Попередня read-only Jira REST перевірка проєкту/дошки, зафіксована вище, підтверджує лише project identity та board metadata. Вона не є live sprint snapshot і не замінює цей невдалий issue fetch.
+- Дозволи й локальний MCP project/tool filter не обходити прямим REST-запитом у межах цього workflow. Для продовження live зіставлення потрібен доступний підтримуваний Jira MCP/плагін або відновлений Docker MCP запуск.
+
 ## Історичні звіти проти live Jira
 
 - `backlog.md` та `testing.md` зберігають вимоги, тест-план, ключі задач і статуси, видимі у переданих звітах/screenshots. Для цих записів зберігай дату й маркуй їх як історичні.
