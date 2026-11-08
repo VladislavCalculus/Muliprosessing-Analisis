@@ -1,7 +1,7 @@
-"""Filtering, FFT and peak detection for one decoded audio signal.
+"""Filtering, FFT and peak detection for one decoded audio packet.
 
-The input is a NumPy-compatible array of audio frames. This module does not
-read or write files, which keeps it independent of the WAV and worker stages.
+This module does not read or write files, which keeps it independent of the WAV
+reader and worker orchestration stages.
 """
 
 from __future__ import annotations
@@ -13,6 +13,8 @@ from typing import Any, Literal
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from scipy import fft, signal
+
+from audio_contracts import AudioPacket
 
 
 @dataclass(frozen=True)
@@ -95,6 +97,7 @@ class SignalPacket:
     peaks_by_channel: tuple[tuple[SpectralPeak, ...], ...]
     filter_config: FilterConfig | None
     peak_config: PeakConfig
+    source_name: str | None = None
     schema_version: int = 1
 
     @property
@@ -119,6 +122,7 @@ class SignalPacket:
         return {
             "schema_version": self.schema_version,
             "source_id": self.source_id,
+            "source_name": self.source_name,
             "sample_rate_hz": self.sample_rate_hz,
             "frame_count": self.frame_count,
             "channel_count": self.channel_count,
@@ -246,30 +250,27 @@ def _detect_peaks(
 
 
 def process_signal(
-    samples: ArrayLike,
-    sample_rate_hz: int,
+    packet: AudioPacket,
     *,
-    source_id: str,
     filter_config: FilterConfig | None = None,
     peak_config: PeakConfig | None = None,
 ) -> SignalPacket:
-    """Process mono or multichannel audio without modifying the input.
+    """Process one decoded audio packet without modifying its input samples.
 
-    Integer PCM input is scaled to approximately [-1, 1]; floating-point input
-    retains its amplitude scale. FFT and peaks describe the returned samples,
-    i.e. the filtered signal when a filter is configured.
+    Integer PCM is scaled to approximately [-1, 1]; floating-point input keeps
+    its amplitude scale. FFT and peaks describe the returned samples, i.e. the
+    filtered signal when a filter is configured.
     """
 
-    if isinstance(sample_rate_hz, bool) or not isinstance(sample_rate_hz, (int, np.integer)) or sample_rate_hz <= 0:
-        raise ValueError("sample_rate_hz must be a positive integer")
-    if not isinstance(source_id, str) or not source_id.strip():
-        raise ValueError("source_id must be a non-empty string")
+    if not isinstance(packet, AudioPacket):
+        raise TypeError("packet must be an AudioPacket")
     if filter_config is not None and not isinstance(filter_config, FilterConfig):
         raise TypeError("filter_config must be a FilterConfig or None")
     if peak_config is not None and not isinstance(peak_config, PeakConfig):
         raise TypeError("peak_config must be a PeakConfig or None")
 
-    frames = _as_audio_frames(samples)
+    sample_rate_hz = packet.sample_rate_hz
+    frames = _as_audio_frames(packet.samples)
     if filter_config is not None:
         if filter_config.cutoff_hz >= sample_rate_hz / 2:
             raise ValueError("cutoff_hz must be below the Nyquist frequency")
@@ -286,11 +287,12 @@ def process_signal(
     spectrum = _amplitude_spectrum(frames, int(sample_rate_hz))
     peaks = _detect_peaks(spectrum, peaks_config)
     return SignalPacket(
-        source_id=source_id,
+        source_id=packet.source_id,
         sample_rate_hz=int(sample_rate_hz),
         samples=frames,
         spectrum=spectrum,
         peaks_by_channel=peaks,
         filter_config=filter_config,
         peak_config=peaks_config,
+        source_name=packet.source_name,
     )

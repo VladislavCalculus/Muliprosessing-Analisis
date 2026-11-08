@@ -17,17 +17,22 @@ python3 -m venv .venv
 
 ```python
 import numpy as np
-from mlt_signal import FilterConfig, process_signal
+from audio_contracts import AudioPacket
+from signal_proc import FilterConfig, process_signal
 
 sample_rate = 8_000
 time = np.arange(sample_rate) / sample_rate
 samples = 0.8 * np.sin(2 * np.pi * 440 * time)
 samples += 0.3 * np.sin(2 * np.pi * 1_000 * time)
 
-packet = process_signal(
-    samples,
-    sample_rate,
+input_packet = AudioPacket(
     source_id="generated-two-tone",
+    source_name="generated-two-tone",
+    sample_rate_hz=sample_rate,
+    samples=samples,
+)
+packet = process_signal(
+    input_packet,
     filter_config=FilterConfig(kind="lowpass", cutoff_hz=600),
 )
 print(packet.peaks_by_channel[0])
@@ -39,12 +44,29 @@ next_stage_payload = packet.to_payload()
 ```python
 from pathlib import Path
 from scipy.io import wavfile
-from mlt_signal import process_signal
+from audio_contracts import AudioPacket
+from signal_proc import process_signal
 
 path = Path("example.wav")
 sample_rate, samples = wavfile.read(path)
-packet = process_signal(samples, sample_rate, source_id=path.name)
+input_packet = AudioPacket(
+    source_id=str(path.resolve()),
+    source_name=path.name,
+    sample_rate_hz=sample_rate,
+    samples=samples,
+)
+packet = process_signal(input_packet)
 ```
+
+## Контракт між читанням файлів і DSP
+
+Кожен успішно декодований файл передається як один `audio_contracts.AudioPacket` версії 1. У пакеті є унікальний у межах запуску `source_id`, необов'язкове ім'я файла `source_name`, `sample_rate_hz` і `samples`. Моно зберігається як масив `(кадри, 1)`, багатоканальний сигнал — `(кадри, канали)`. Масив має бути числовим і C-contiguous; integer PCM передається у вихідному масштабі, float — у вихідному масштабі. `signal_proc` виконує нормалізацію integer PCM.
+
+Читач файлів повертає `AudioReadResult`: для успіху — `AudioPacket`, для помилки окремого файла — малий `AudioReadError` із `source_id`, `error_code` і повідомленням. Оркестратор записує помилку й продовжує інші файли; `process_signal` приймає лише успішний `AudioPacket`.
+
+Для процесів передавай сам dataclass через `multiprocessing.Queue`, а не JSON/base64 із великими масивами. Пакет — pickle-сумісний; після створення/передачі не змінюй `samples`. Черга серіалізує масив і може його копіювати. Якщо виміри покажуть, що це вузьке місце для великих WAV, наступним кроком може бути shared-memory дескриптор зі схемою тієї самої metadata; зараз цей рівень складності не потрібний.
+
+Кожен функціональний модуль матиме власний пакет у `src/` (наприклад, `src/signal_proc/`). Спільні типи передачі даних належать `src/audio_contracts/`, щоб модулі не імпортували внутрішню реалізацію один одного.
 
 ## Контракт пакета
 
@@ -53,6 +75,7 @@ packet = process_signal(samples, sample_rate, source_id=path.name)
 | Поле | Формат і значення |
 | --- | --- |
 | `source_id` | Ідентифікатор файлу або іншого джерела, переданий викликачем |
+| `source_name` | Необов'язкова коротка назва джерела для відображення |
 | `sample_rate_hz` | Ціла частота дискретизації |
 | `samples` | `float64` NumPy-масив `(кількість кадрів, кількість каналів)` після фільтрації; без фільтра — копія вхідних даних |
 | `spectrum.frequencies_hz` | Частоти бінів FFT, масив `(кількість бінів,)` |
