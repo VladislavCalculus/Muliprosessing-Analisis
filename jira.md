@@ -53,7 +53,7 @@
 - `jira_updater` змінює тільки вибрані issue status/коментарі. Перед переходом отримує дозволені workflow transitions; після переходу перечитує issue. Не змінює status напряму й не виконує масові переходи.
 - `Done` — тільки після виконання відомих acceptance criteria, необхідних перевірок, успішного незалежного review без відкритих blocker/high findings і перевіреного Jira transition. Запис у Jira може завершитися невдало — тоді не називай issue Done.
 - Jira status і Resolution — окремі поля. Перевір Resolution після terminal transition і не підставляй її довільно; використовуй значення, задане workflow/transition metadata.
-- Best-practice джерела: [Atlassian bug report template](https://www.atlassian.com/software/jira/templates/bug-report), [Jira Cloud issue transitions API](https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/), [Codex subagents and custom agents](https://learn.chatgpt.com/docs/agent-configuration/subagents).
+- Best-practice джерела: [Atlassian bug report template](https://www.atlassian.com/software/jira/templates/bug-report), [Jira Cloud issue transitions API](https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/), [Atlassian Resolution guidance](https://support.atlassian.com/jira-cloud-administration/docs/what-is-a-resolution-in-jira/), [Codex subagents and custom agents](https://learn.chatgpt.com/docs/agent-configuration/subagents).
 
 ## Практика запитів
 
