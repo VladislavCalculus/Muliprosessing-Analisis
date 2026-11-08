@@ -7,7 +7,7 @@ reader and worker orchestration stages.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import ceil, isfinite
+from math import isfinite
 from typing import Any, Literal
 
 import numpy as np
@@ -208,18 +208,22 @@ def _detect_peaks(
 ) -> tuple[tuple[SpectralPeak, ...], ...]:
     frequencies = spectrum.frequencies_hz
     amplitudes = spectrum.amplitudes
-    resolution = frequencies[1] - frequencies[0] if len(frequencies) > 1 else 0.0
-    distance = max(1, ceil(config.min_separation_hz / resolution)) if resolution else 1
     result: list[tuple[SpectralPeak, ...]] = []
 
     for channel_index in range(amplitudes.shape[1]):
         values = amplitudes[:, channel_index].copy()
         values[0] = 0.0  # DC is not a dominant audible frequency.
-        maximum = float(values.max())
+        in_range = frequencies >= config.min_frequency_hz
+        if not in_range.any():
+            result.append(())
+            continue
+        # Threshold against the strongest bin the caller asked us to consider.
+        # Peaks outside this frequency range must not suppress eligible peaks.
+        maximum = float(values[in_range].max())
         if maximum <= 0:
             result.append(())
             continue
-        indices, _ = signal.find_peaks(values, distance=distance)
+        indices, _ = signal.find_peaks(values)
         # find_peaks omits endpoints; the Nyquist bin can be a valid maximum.
         if len(values) > 1 and values[-1] > values[-2]:
             indices = np.append(indices, len(values) - 1)
@@ -227,11 +231,13 @@ def _detect_peaks(
         indices = [
             int(index)
             for index in indices
-            if frequencies[index] >= config.min_frequency_hz and values[index] >= threshold
+            if in_range[index] and values[index] >= threshold
         ]
         indices.sort(key=lambda index: (-values[index], frequencies[index]))
         selected: list[int] = []
         for index in indices:
+            # Enforce physical-frequency separation after range filtering so
+            # an out-of-range peak cannot suppress an in-range candidate.
             if all(abs(frequencies[index] - frequencies[prior]) >= config.min_separation_hz for prior in selected):
                 selected.append(index)
             if len(selected) == config.max_peaks:
