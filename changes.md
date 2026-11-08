@@ -1,5 +1,12 @@
 # Дайджест змін
 
+## 2026-11-08 — використано Jira REST fallback і звірено Sprint 1 tasks з MLT-5
+
+- Після початкової невдалої спроби через MCP/Docker використано наявні project-local credentials через read-only Jira Cloud REST API; автентифікований account збігається з раніше заданим. У project-local інструкціях зафіксовано MLT-scoped REST fallback, тож Docker не потрібен для майбутнього Jira читання.
+- Live Sprint 1 snapshot: board 3, sprint ID 1 `active` попри завершений end date 2026-10-04; 15 issues загалом, 8 призначені цьому акаунту (MLT-9/10/11, MLT-23/24/25, MLT-32/33), усі `To Do`. Перелік і priorities — `backlog.md`; жодних Jira writes не виконано.
+- Acceptance criteria stories MLT-23/24/25 звірено з MLT-5. Фільтр/FFT/піки реалізовані в бібліотечному модулі; full user journey обмежений відсутністю WAV reader та UI, а окремого disk persistence немає.
+- Точні Jira bug criteria MLT-32/33 виконані на коді з `fadd1ec`: 440 Hz при 800 kHz повернувся точно; суміш 200 Hz/1.0 + 600 Hz/0.5 повернула піки в очікуваному порядку. Поточний defect не відтворено; Jira статуси лишились To Do. MLT-30/31 не перевірені, бо WAV reader ще відсутній.
+
 ## 2026-11-08 — аудит MLT-5 виявив і виправив відбір позадіапазонних піків
 
 - Прямо відтворено PR3 TC-01…12 на DSP-коді: усі числові/негативні критерії пройшли. Додатково перевірено PR4 довгий 800 kHz/800000-frame сигнал; 440 Hz і amplitude 1.0 відновились. Одноразовий час — спостереження, не benchmark.
