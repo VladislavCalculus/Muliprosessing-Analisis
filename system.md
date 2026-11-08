@@ -1,14 +1,14 @@
 # Фактичний модуль MLT-5
 
-Цей файл описує наявну реалізацію, а не весь задуманий продукт. Джерела: [`../README.md`](../README.md), [`processing.py`](../src/mlt_signal/processing.py), [`__init__.py`](../src/mlt_signal/__init__.py), [`pyproject.toml`](../pyproject.toml).
+Цей файл описує наявну реалізацію, а не весь задуманий продукт. Джерела: [`../README.md`](../README.md), [`processing.py`](../src/signal_proc/processing.py), [`__init__.py`](../src/signal_proc/__init__.py), [`packets.py`](../src/audio_contracts/packets.py), [`pyproject.toml`](../pyproject.toml).
 
 ## Контракт
 
-Публічний виклик — `process_signal(samples, sample_rate_hz, source_id=..., filter_config=None, peak_config=None)`. Він приймає декодовані кадри форми `(frames,)` або `(frames, channels)` і повертає `SignalPacket` schema v1. Файли не читає й не записує. Mono приводиться до одного каналу; канали аналізуються незалежно. Вхід не змінюється.
+Публічний виклик — `process_signal(audio_packet, filter_config=None, peak_config=None)`. Він приймає `audio_contracts.AudioPacket` schema v1 і повертає `SignalPacket` schema v1. Файли не читає й не записує. Mono приводиться до `(frames, 1)` у `AudioPacket`; канали аналізуються незалежно. `source_id` і `source_name` проходять у результат. Вхідні семпли не змінюються.
 
-Цілі PCM переводяться у float64 приблизно до `[-1, 1]`; float зберігає свій масштаб. Відхиляються порожні/неправильні масиви, нечислові або нескінченні значення, непозитивна частота дискретизації та порожній `source_id`.
+`AudioPacket` зберігає вихідний тип PCM: цілі значення MLT-5 переводить у float64 приблизно до `[-1, 1]`; float зберігає свій масштаб. На вході контракту відхиляються порожні/неправильні масиви, bool/object/complex dtype, нечислові або нескінченні значення, непозитивна частота дискретизації та порожній `source_id`.
 
-`SignalPacket` містить вихідні (за потреби відфільтровані) кадри, частоту дискретизації, спектр, піки за каналами й конфігурації. `to_payload()` залишає NumPy-масиви масивами; сам пакет можна передавати через `multiprocessing.Queue`/pickle. JSON-серіалізацію масивів треба робити окремо.
+`SignalPacket` містить вихідні (за потреби відфільтровані) кадри, частоту дискретизації, спектр, піки за каналами, ідентифікатор/ім’я джерела й конфігурації. `to_payload()` залишає NumPy-масиви масивами; пакети можна передавати через `multiprocessing.Queue`/pickle. JSON-серіалізацію масивів треба робити окремо. Невдале читання файлу представляє `AudioReadError`; DSP приймає лише `AudioPacket`.
 
 ## DSP
 
@@ -18,4 +18,4 @@
 
 ## Середовище
 
-Python `>=3.10`; залежності NumPy `>=2.1,<3` і SciPy `>=1.15,<2`; версія пакета в `pyproject.toml` — `0.1.0`. Інтеграція WAV належить MLT-4, графіки/UI — MLT-3, керування worker-процесами — MLT-2.
+Python `>=3.10`; залежності NumPy `>=2.1,<3` і SciPy `>=1.15,<2`; версія distribution у `pyproject.toml` — `0.1.0`. MLT-5 імпортується з `signal_proc`, спільні типи — з `audio_contracts`. Інтеграція WAV належить MLT-4, графіки/UI — MLT-3, керування worker-процесами — MLT-2.

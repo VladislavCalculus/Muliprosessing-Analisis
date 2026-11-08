@@ -11,10 +11,10 @@
 
 ## Як читати
 
-Для загального контексту починай з `architecture.md`, для роботи з DSP — з `system.md`; перед діями перевір `status.md`. Звіряй кодові твердження з `../README.md`, `../src/mlt_signal/processing.py` і `../pyproject.toml`.
+Для загального контексту починай з `architecture.md`, для роботи з DSP — з `system.md`; перед діями перевір `status.md`. Звіряй кодові твердження з `../README.md`, `../src/signal_proc/processing.py`, `../src/audio_contracts/packets.py` і `../pyproject.toml`.
 
 Звіти, передані користувачем (`Звіт_КПІ4_ПР1(1).docx`, `Звіт_КПІ_Пр2(1).docx`, `КПІ4_ПР3_Лакей(1).docx`, `КПІ4_ПР4_Bugreport(1).docx`), є датованими артефактами планування. Їхні Jira-статуси й баг-репорти не вважай актуальними або підтвердженими без нової перевірки.
 
 ## Межа Git
 
-Ця папка — окремий вкладений Git-репозиторій на orphan-гілці `kb-only`; він містить тільки KB і не входить до гілок коду. Перевіряй його окремо командою `git -C knowledge-base status --short --branch`. Remote для KB не налаштований.
+Ця папка — окремий вкладений Git-репозиторій на orphan-гілці `kb-only`; він містить тільки KB і не входить до гілок коду. `origin` вказує на GitHub remote проєкту, але публікуй цей репозиторій тільки в гілку `kb-only`, ніколи в `main`. Перевіряй стан командою `git -C knowledge-base status --short --branch`.
