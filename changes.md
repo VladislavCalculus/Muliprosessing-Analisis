@@ -1,5 +1,16 @@
 # Дайджест змін
 
+## 2026-11-08 — MLT-5 unit suite пройшов із 100% statement/branch coverage
+
+- Додано 45 pytest cases для конфіг-валідації, PCM, low/high-pass, even/odd FFT, Nyquist, peak threshold/range/separation, stereo, input immutability, payload і pickle. Два test doubles — SOS stub і `unittest.mock.Mock`; різні assertion APIs описані у `test/README.md`.
+- Перший запуск: 44 passed, 1 failed — тест чистого Nyquist тону показав втрату endpoint plateau. Виправлено production code, не тести; після цього 45/45 пройшли.
+- Coverage review також зробив однокадровий window fallback явним: SciPy Hann(1) уже має значення 1, тому зміна зберігає результат, але окремо покриває гілку безпечної нормалізації.
+- Coverage.py 7.17.2, branch mode: `signal_proc/processing.py` 154 statements і 56 branches — 100%, без пропусків; пакетний `__init__.py` також 100%. Test source hashes до/після запуску не змінилися.
+- Packaging verification: wheel `mlt_signal_processing-0.1.0-py3-none-any.whl` успішно зібрано через `pip wheel --no-deps --no-build-isolation .` після встановлення `setuptools 84.2.1` у `.venv`.
+- Незалежний review підтвердив коректність тестів у межах `signal_proc` без blocker/high findings. Jira MLT-14 лишається To Do, бо її опис охоплює також відсутній WAV parser; див. межі у `testing.md`.
+- Тести охоплюють обраний `signal_proc`, але не WAV parsing, якого поки немає. Jira MLT-14 лишається `To Do`; write у Jira не робили.
+- Джерела і деталі — в `testing.md`; suite commands і optional dependencies — `test/README.md`, `pyproject.toml`.
+
 ## 2026-11-08 — підготовлено pytest suite для `signal_proc` перед першим запуском
 
 - Додано MLT-5 host-only unit suite під `test/`, `python3 test/run_tests.py`, optional test dependencies та line/branch Coverage.py конфігурацію.

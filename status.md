@@ -6,7 +6,7 @@
 
 - Гілка проєкту `main` на `origin/main` має коміт `fadd1ec` (`Fix peak filtering within selected frequency range`); попередній `6e6cbb1` (`Ignore project-local Codex configuration`).
 - Реалізовані пакети: `src/audio_contracts/` (`AudioPacket`, `AudioReadError`, `AudioReadResult`) і `src/signal_proc/` (MLT-5). `process_signal` приймає `AudioPacket`; реалізує integer PCM → float64, optional Butterworth low/high-pass, Hann-window one-sided FFT та per-channel peak detection.
-- Editable package build і компіляція вихідних Python-файлів проходили після зміни package layout. У коміті `fadd1ec` виправлено відбір піків у `src/signal_proc/processing.py`; inline числові перевірки PR3 TC-01…12, два регресійні сценарії, Jira MLT-32/33 exact criteria та `py_compile` пройшли. Для нової задачі створено pytest suite у `test/`; його перший запуск і coverage measurement ще очікують встановлення optional залежностей.
+- Editable package build і компіляція Python-файлів проходили після зміни package layout; поточна wheel build (`pip wheel --no-deps --no-build-isolation .`, setuptools 84.2.1) також успішна. Коміт `fadd1ec` містить range/separation fix. Нова pytest suite: 45/45 пройшли; Coverage.py branch/statement coverage для `signal_proc` — 100% (154 statements, 56 branches). Під час першого запуску знайдено й виправлено Nyquist endpoint bug; потім явно оформлено еквівалентний однокадровий window fallback для повного branch coverage. Обидві production правки в `src/signal_proc/processing.py` поки незакомічені.
 - MLT-4 WAV reader, MLT-2 worker orchestration, MLT-3 presentation і MLT-1 test/performance stage у цьому checkout ще не реалізовані. Їхні межі описані як контракт або рекомендований план у `architecture.md`, `data_contract.md` та `decisions.md`.
 
 ## Контракт модулів
@@ -24,7 +24,7 @@
 - Для вибраних MLT задач зафіксовано рольовий delivery workflow: live fetch, реалізація, незалежний review, evidence-based Bug creation і перевірений terminal transition. Точні локальні Codex agent TOML/MCP filters зберігаються лише в ignored `.codex/`; фактичний Jira status workflow ще треба звірити під час першої операції.
 - У цьому аналізі Jira issues не створювалися, status/resolution не змінювалися; усі вісім призначених issues повернули `To Do`. Codex MCP handshake не потрібен для read-only REST fallback.
 - 12 test cases, 18 checklist пунктів і 4 potential bugs описані в `testing.md`. Поточний точний replay MLT-32/33 пройшов; MLT-30/31 лишаються неперевіреними через відсутність WAV reader.
-- Поточний read-only огляд коду підтвердив лише `audio_contracts` і `signal_proc`; MLT-4 WAV reader не існує. Один підтверджений edge-case bug у фільтрації піків виправлено; до/після докази й фактичні результати MLT-5 — у `testing.md`. Поточний pytest suite у `test/` написаний, але ще не запускався.
+- Поточний read-only огляд коду підтвердив лише `audio_contracts` і `signal_proc`; MLT-4 WAV reader не існує. Два DSP edge cases виправлено й закріплено regression tests; до/після докази та coverage — у `testing.md`.
 - Глобальний поріг допустимої похибки DSP і мінімальний speedup не визначені; не вводити їх як прийняті критерії без рішення команди.
 
 ## Git і база знань
@@ -38,6 +38,8 @@
 - У поточному локальному checkout є незакомічене видалення `tools/build_mlt5_protocol.py`. Це зміна користувача; не відновлювати автоматично й не включати в сторонній коміт. У `origin/main` на даті звірки старий файл ще присутній і використовує попередній `mlt_signal`/direct-array API, тому його сумісність із новим `AudioPacket` контрактом не підтверджена.
 - Перед наступною інтеграцією перевір усі приклади, генератори та інші споживачі старого API. Окремо з’ясуй долю локально видаленого генератора; не роби висновків про нього з наявності в remote.
 - Jira live fetch завершено; цей запит був read-only аналізом. Для повного user journey MLT-23/24/25 у checkout бракує MLT-4 WAV reader та MLT-3 UI/presentation; пріоритет/реалізацію наступних задач визначати за актуальним Jira scope.
+- За останнім live snapshot Jira MLT-14 `Створити unit-тести` перебуває `To Do`, Medium, parent MLT-1 і не призначена автентифікованому акаунту; користувач окремо поставив її тут. Обраний `signal_proc` suite пройшов незалежний review, однак Jira Done не виставлявся, бо опис також згадує WAV parser, якого немає в checkout. Результат і межі scope — у `testing.md`.
+- Локальні зміни цього завдання (`test/`, `pyproject.toml`, `.gitignore`, `src/signal_proc/processing.py`) залишаються в робочому дереві; код ще не запушений.
 - Поточний користувацький checkout має незакомічене видалення `tools/build_mlt5_protocol.py`; це не пов’язано з Jira review і не змінювати автоматично.
 
 ## Межі достовірності
