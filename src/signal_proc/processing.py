@@ -190,7 +190,7 @@ def _amplitude_spectrum(
     centered = frames - frames.mean(axis=0, keepdims=True)
     window = signal.windows.hann(frame_count, sym=False)
     window_sum = window.sum()
-    if window_sum == 0:  # A one-frame Hann window has no useful gain.
+    if window_sum == 0:  # Protect normalization if a window has no gain.
         window = np.ones(frame_count, dtype=np.float64)
         window_sum = float(frame_count)
     coefficients = fft.rfft(centered * window[:, np.newaxis], axis=0)
@@ -225,7 +225,9 @@ def _detect_peaks(
             continue
         indices, _ = signal.find_peaks(values)
         # find_peaks omits endpoints; the Nyquist bin can be a valid maximum.
-        if len(values) > 1 and values[-1] > values[-2]:
+        # Include a tied final plateau too (a Nyquist tone with a periodic Hann
+        # window can have equal amplitude in the last two bins).
+        if len(values) > 1 and values[-1] >= values[-2]:
             indices = np.append(indices, len(values) - 1)
         threshold = maximum * config.min_amplitude_ratio
         indices = [
