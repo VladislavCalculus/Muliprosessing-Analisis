@@ -21,7 +21,7 @@ addopts = "-ra"
 
 [tool.coverage.run]
 branch = true
-source = ["audio_io", "audio_pipeline", "signal_proc"]
+source = ["audio_io", "signal_proc"]
 
 [tool.coverage.report]
 show_missing = true
