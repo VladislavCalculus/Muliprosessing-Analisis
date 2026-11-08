@@ -4,7 +4,7 @@
 
 ## Перевірена реалізація
 
-- Гілка проєкту `main` на `origin/main` має коміт `a2ef008` (`Define audio packet contract and module layout`).
+- Гілка проєкту `main` на `origin/main` має коміт `6e6cbb1` (`Ignore project-local Codex configuration`); попередній кодовий коміт — `a2ef008` (`Define audio packet contract and module layout`).
 - Реалізовані пакети: `src/audio_contracts/` (`AudioPacket`, `AudioReadError`, `AudioReadResult`) і `src/signal_proc/` (MLT-5). `process_signal` приймає `AudioPacket`; реалізує integer PCM → float64, optional Butterworth low/high-pass, Hann-window one-sided FFT та per-channel peak detection.
 - Editable package build і компіляція вихідних Python-файлів пройшли після зміни package layout. У package discovery входять `audio_contracts` і `signal_proc`. Тести не запускались у межах попереднього кодування; у цій роботі змін коду немає.
 - MLT-4 WAV reader, MLT-2 worker orchestration, MLT-3 presentation і MLT-1 test/performance stage у цьому checkout ще не реалізовані. Їхні межі описані як контракт або рекомендований план у `architecture.md`, `data_contract.md` та `decisions.md`.
@@ -18,7 +18,9 @@
 
 ## Звітні вимоги та перевірки
 
-- KB містить карту Jira з PR1 та зафіксовані вимоги/план тестування PR2–PR4. Вкладені screenshots показують лише історичний стан на момент створення звітів; поточний Jira не перевірявся.
+- Ідентифікацію live Jira зафіксовано в `jira.md`: 2026-11-08 Jira REST підтвердив account authentication (HTTP 200), проект `MLT` (`Muliprosessing-Analisis`) і board `MLT board` ID 3. Поточні issue statuses/assignees повним live запитом не звіряли.
+- KB містить вимоги й план тестування PR1–PR4. Вкладені screenshots показують лише історичний стан на момент створення звітів; не трактуй їх як поточні Jira issue statuses.
+- Доступ до Jira REST API підтверджений; локальний Atlassian MCP container handshake ще не підтверджений. Локальні деталі підключення/хоста залишаються в ignored `.codex/JIRA-STATUS.md`.
 - 12 test cases, 18 checklist пунктів і 4 potential bugs описані в `testing.md`. Жоден кейс чи bug report не позначений як фактично виконаний/підтверджений звітами.
 - Глобальний поріг допустимої похибки DSP і мінімальний speedup не визначені; не вводити їх як прийняті критерії без рішення команди.
 
@@ -26,7 +28,7 @@
 
 - KB публікується лише в orphan-гілці `kb-only` того самого remote, що й `main`; локальний `knowledge-base/` має бути linked worktree того самого репозиторію. Дерева `main` і `kb-only` ізольовані й не мають спільного предка.
 - У KB-гілці дозволені тільки її Markdown-документи; код, тестові файли й конфігурація проєкту належать до `main`. `knowledge-base/` і локальний `AGENTS.md` ігноруються кореневим `.gitignore`.
-- Інструкція локального агента в корені вимагає читати цю KB на початку кожної змістовної задачі, підтримувати її під час роботи, оновлювати `status.md` + `changes.md` і пушити KB окремо в `origin/kb-only`.
+- `AGENTS.md` (локальний/ignored) і `collaboration.md` задають pull-before-read, fetch-before-push, rebase, conflict resolution та hash verification між агентами.
 
 ## Робоче дерево та handover
 
