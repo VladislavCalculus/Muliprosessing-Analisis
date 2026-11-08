@@ -105,3 +105,10 @@
 - Створено `jira.md`: live-запити 2026-11-08 підтвердили REST account `200`, проєкт key `MLT` з API-назвою `Muliprosessing-Analisis` і board ID 3 `MLT board`. Поточні issue statuses не завантажувалися. У KB не записувалися account email або API token.
 - Оновлено `status.md`/`backlog.md`, щоб відрізняти підтверджену project identity від історичних issue-status зображень у звітах. Live API project name відрізняється написанням від назви у DOCX; для зіставлення використовуй key `MLT`.
 - Перед редагуванням `kb-only` синхронізовано fetch-ем; branch був актуальний відносно `origin/kb-only`. Код не змінювався. Усі ці знання належать лише KB orphan-гілці; після оновлення її hash перевіряється окремо від `main`.
+
+## 2026-11-08 — оформлено протокол unit-тестів MLT-5
+
+- Додано `docs/MLT5_unit_test_protocol.docx` у робоче дерево `main`: 10 тестових функцій `signal_proc`, assertions, два test doubles, покриття та повний test source appendix. Додаток перевірено на точну відповідність `test/test_signal_proc.py` (258 рядків).
+- Coverage.py 7.17.2 повторно запущено з окремим тимчасовим data file, щоб не змінювати існуючий `.coverage`: 10 passed за 3.23 s; 97% combined statement/branch coverage; 4 непокриті statements і 3 partial branches.
+- Google Classroom plugin/connector не знайдений через Plugin Management; документ залишений локально готовим до подання. Jira не запитувалась і не змінювалась.
+- Перший `git fetch` у звичайному sandbox був заблокований OS permission error під час запису `FETCH_HEAD`. Перед публікацією авторизований fetch успішно звірив remote: `origin/kb-only` лишився на `5e9af55`; локальна гілка була один commit попереду, push і фінальна перевірка ще очікують.

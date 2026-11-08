@@ -182,3 +182,11 @@ Live Jira MLT-14 (`Створити unit-тести`) має status `To Do`, par
 Плановані артефакти: unit suites (`test_wav_parser.py`, `test_dsp.py`, `test_multiprocessing.py` як назви у звіті), bug reports Jira, performance таблиця/графіки MLT-12, summary report. Їх фактична наявність не підтверджена.
 
 За планом: підготовка 19–22.09.2026; unit 23–27.09; integration 28–30.09; performance 01–02.10; виправлення/regression 02–04.10. Ризики: затримка worker-ів, некоректне завершення процесу, відсутність speedup на малих файлах, брак WAV fixtures, різні версії бібліотек. Це історичні дати, не поточний графік.
+
+## Протокол unit-тестування `signal_proc` — 2026-11-08
+
+Для навчальної вимоги підготовлено DOCX `docs/MLT5_unit_test_protocol.docx`. Документ містить постановку тестування, таблицю всіх 10 тестових функцій, різновиди assert, пояснення `butter_stub` і `Mock`-двійників, команду Coverage.py, оцінку покриття та повний лістинг `test/test_signal_proc.py` (258 рядків). Лістинг у DOCX звірено з тестовим файлом рядок у рядок.
+
+Поточний повторний вимір 2026-11-08: Python 3.13.7, pytest 9.2.0, Coverage.py 7.17.2; 10 tests passed за 3.23 s. Команда запуску: `COVERAGE_FILE=/private/tmp/kp4-signalproc-report.coverage .venv/bin/python -m coverage run --branch --source=signal_proc -m pytest -p no:cacheprovider -q test/test_signal_proc.py`; потім `COVERAGE_FILE=/private/tmp/kp4-signalproc-report.coverage .venv/bin/python -m coverage report -m`. Coverage — 97% combined statement/branch у `signal_proc`: 156 statements, 4 пропущено; 56 branches, 3 частково покриті. Непокриті випадки: zero-gain window fallback, порожній частотний діапазон і відхилення піка через separation. Тести та production code під час підготовки протоколу не змінювались.
+
+Classroom upload не виконано: у доступних інтеграціях не знайдено Google Classroom конектора; наявний Google Drive не є завантаженням у конкретне завдання курсу. DOCX готовий для ручного подання. Jira не потрібна для формування цього протоколу; актуальний issue status не перевірявся.
