@@ -49,3 +49,9 @@ MLT-4 повертає `AudioReadError`, якщо один файл не чит�
 ## D-09. Агент самостійно синхронізує спільну KB
 
 Кожен агент спершу fetch-ить `origin/kb-only`, читає актуальну KB, перед комітом повторно синхронізує remote, розв’язує Markdown-конфлікти за доказами, а потім пушить без force. У фізично спільному checkout з незакоміченою паралельною роботою використовуй ізольований detached worktree. Не запитуй розробника про конфлікти змісту; невирішну фактичну суперечність документуй як непідтверджену з джерелами/датами. Детальний алгоритм — [`collaboration.md`](collaboration.md).
+
+## D-10. Вибрані Jira-задачі проходять role-based цикл із доказовим Done gate
+
+Для MLT задач/спринтів, які користувач прямо вказав як роботу, агент спершу читає live Jira і вибудовує залежності, потім виконує кодову зміну, незалежний review і лише після цього змінює статус Jira. Ролі мають чіткі межі: fetcher — read-only; implementer — код без Jira writes; reviewer — read-only; bug reporter — створення доказового Bug після duplicate search; updater — transition/comment тільки для вибраних keys.
+
+**Наслідки:** кожний issue закривається окремо; не робляться bulk transitions, незавершені sprint задачі не позначаються Done, а підтверджені позаскопові дефекти отримують Bug issue. Перед transition треба отримати доступні Jira transitions, після — перечитати status і Resolution. Jira status і Resolution окремі; значення Resolution має походити з workflow/transition, а не здогадки агента. Локальна реалізація Codex roles і MCP write filters лишається в ignored `.codex/`; KB зберігає переносимі правила, не credentials чи host-specific config.

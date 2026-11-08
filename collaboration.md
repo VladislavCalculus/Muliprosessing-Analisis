@@ -61,6 +61,8 @@ git worktree remove .codex/kb-worktrees/<унікальний-id-задачі>
 
 Якщо робота в `knowledge-base/` чиста, можна редагувати її напряму. Не запускай два агенти на редагування того самого файла в одній незакоміченій worktree; розділяй роботу по документах або використовуй окремі worktree.
 
+Для Jira delivery застосовуй ті самі межі володіння: read-only fetch/planning може бути паралельним, але один implementer володіє спільною кодовою worktree за раз; reviewer читає завершений diff після implementer; Jira reporter/updater працюють після визначених gates і лише у вибраних MLT issues. Не запускай одночасно два Jira writers на ті самі keys. KB edits зводить координатор за процедурою нижче і публікує їх лише у `kb-only`.
+
 ## Злиття комітів, push rejection і Markdown-конфлікти
 
 Коли push відхилений через нові remote-коміти, збережи власний коміт і виконай:

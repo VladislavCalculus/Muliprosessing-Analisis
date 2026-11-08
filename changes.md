@@ -1,5 +1,13 @@
 # Дайджест змін
 
+## 2026-11-08 — налаштовано рольовий Jira workflow Codex
+
+- Додано локальні Codex ролі для Jira fetch/sprint planning, implementer, reviewer, bug reporter і status updater; конфігурація та інструкції лишаються у Git-ignored `.codex/`.
+- Workflow вимагає live Jira дані, залежності й acceptance criteria; незалежний reviewer gate перед Done; перехід тільки через доступну Jira workflow transition і перевірку status/Resolution після запису.
+- Зафіксовано bug-report шаблон на основі Atlassian guidance: чіткий заголовок, кроки відтворення, environment, expected/actual, вплив і evidence; reporter перевіряє дублікати та не вигадує priority/severity/root cause.
+- Локальний MCP write scope звужений до MLT та потрібних Jira tools. У цій роботі Jira не змінювали; Docker відсутній, тому handshake і статусний workflow не перевірені.
+- Підстава: локальні `.codex/` role/workflow files; [Atlassian Bug Report Template](https://www.atlassian.com/software/jira/templates/bug-report), [Jira Cloud issue transitions API](https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/), [Codex custom agents](https://learn.chatgpt.com/docs/agent-configuration/subagents).
+
 ## 2026-11-08 — відновлено контекст, контракт і роботу KB
 
 ### Теоретична база

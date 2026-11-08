@@ -21,6 +21,8 @@
 - Ідентифікацію live Jira зафіксовано в `jira.md`: 2026-11-08 Jira REST підтвердив account authentication (HTTP 200), проект `MLT` (`Muliprosessing-Analisis`) і board `MLT board` ID 3. Поточні issue statuses/assignees повним live запитом не звіряли.
 - KB містить вимоги й план тестування PR1–PR4. Вкладені screenshots показують лише історичний стан на момент створення звітів; не трактуй їх як поточні Jira issue statuses.
 - Доступ до Jira REST API підтверджений; локальний Atlassian MCP container handshake ще не підтверджений. Локальні деталі підключення/хоста залишаються в ignored `.codex/JIRA-STATUS.md`.
+- Для вибраних MLT задач зафіксовано рольовий delivery workflow: live fetch, реалізація, незалежний review, evidence-based Bug creation і перевірений terminal transition. Точні локальні Codex agent TOML/MCP filters зберігаються лише в ignored `.codex/`; фактичний Jira status workflow ще треба звірити під час першої операції.
+- У цій роботі Jira issues не створювалися й їхні status/resolution не змінювалися. Codex workflow налаштовано, але Docker CLI відсутній; MCP handshake і фактична доступність Jira tools лишаються неперевіреними.
 - 12 test cases, 18 checklist пунктів і 4 potential bugs описані в `testing.md`. Жоден кейс чи bug report не позначений як фактично виконаний/підтверджений звітами.
 - Глобальний поріг допустимої похибки DSP і мінімальний speedup не визначені; не вводити їх як прийняті критерії без рішення команди.
 
