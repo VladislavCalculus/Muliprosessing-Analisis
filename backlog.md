@@ -120,4 +120,4 @@ Jira Cloud REST JQL `project = MLT AND statusCategory != Done AND assignee IS NO
 | MLT-30 Bug | To Do | Batch continuation покритий тестом з не-WAV bytes; structurally truncated WAV fixture відсутній |
 | MLT-31 Bug | To Do | Zero-byte WAV повертає `empty_audio`; цей сценарій тестується |
 
-Точні Jira описи і факт, що паралельність належить також worker-orchestration scope, звіряй із live Jira та `architecture.md`. Наявність коду не переводить issue у Done.
+Точні Jira описи й розподіл parallel scheduling звіряй із live Jira та `architecture.md`. Гілку `mlt-4-wav` злито в `main` без конфліктів commit `85ce596`; Jira statuses не змінювали. `read_wav_batch` лишився послідовним, тому код сам по собі не закриває MLT-27. Наявність коду не переводить issue у Done.

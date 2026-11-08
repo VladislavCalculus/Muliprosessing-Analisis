@@ -161,7 +161,7 @@ Live Jira MLT-14 (`Створити unit-тести`) має status `To Do`, par
 - Код і документація заявляють PCM 8/16/24/32 та IEEE float32/64; fixture tests генерують лише PCM16. Static review не виявив певного decoding defect; решта форматів і truncated-WAV test coverage не доведені.
 - Проєктний suite: 18 passed за 1.75 s, включно з 8 MLT-4 і 10 MLT-5 pytest cases. Команда з окремого worktree: `PYTHONPATH=src python -m pytest -p no:cacheprovider test`. Перший звичайний запуск теж дав 18 passed, але з cache-permission warning; повтор без cache provider завершився чисто.
 
-Це read-only review: кандидатна гілка не змінювалася, Jira статуси не переводилися. MLT-27 parallelism лишається питанням scope/реалізації перед Done.
+Цей попередній огляд був read-only; Jira статуси не переводилися. Після нього `mlt-4-wav` злито в `main` без конфліктів (`85ce596`). У вузько звуженій merge-only роботі тести повторно не запускали; попередній branch suite був 18/18. MLT-27 batch worker scheduling лишається відкритим.
 
 ## Призупинення, артефакти й ризики
 

@@ -1,5 +1,11 @@
 # Дайджест змін
 
+## 2026-11-08 — MLT-4 WAV reader злито в main без додаткового pipeline
+
+- `mlt-4-wav` merged у `main` commit `85ce596` без конфліктів; remote `main` на `f73be7c` підтверджений. Додатковий `audio_pipeline` commit `db974ab` скасований новим revert-комітом за звуженим запитом користувача; цей код, CLI і чотири pipeline tests відсутні у поточному tree.
+- `audio_io` тепер інтегрований у main поруч із `audio_contracts` і `signal_proc`. Попередній MLT-4 candidate suite був 18/18; поточний вузький merge крок повторного запуску suite не включав. Jira не змінювали.
+- `read_wav_batch` залишається послідовним; MLT-2 worker scheduling, PCM formats besides tested fixtures, truncated WAV case та MLT-3 UI лишаються відкритими.
+
 ## 2026-11-08 — переглянуто `mlt-4-wav` проти Jira другого розробника
 
 - Виявлено та fetch-нуто `origin/mlt-4-wav` (`94e9145`, після реалізації `0a36a7e`). Live REST JQL у MLT показав MLT-4 Epic `In Progress`, а MLT-6/7/8, MLT-26/27, MLT-30/31 — `To Do` для іншого розробника.

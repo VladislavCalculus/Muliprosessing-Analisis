@@ -91,4 +91,4 @@ MLT-4 читає WAV, MLT-5 обробляє декодовані відліки
 
 ## Наявна реалізація проти майбутнього
 
-`AudioPacket`, `AudioReadError`, `AudioReadResult` і прийом пакета в MLT-5 реалізовані. WAV-парсер, worker job descriptor, worker pool, помилка виконання DSP як окремий return envelope і UI-агрегація поки не реалізовані в цьому checkout. Їх описано як інтеграційний контракт/наступний етап, не як наявний код.
+`AudioPacket`, `AudioReadError`, `AudioReadResult`, WAV parser і прийом пакета в MLT-5 реалізовані у `main`. Worker job descriptor, process pool, окремий DSP error envelope та UI-агрегація не реалізовані. Loopback HTTP pipeline, що тимчасово був у `db974ab`, скасований; він не є чинним контрактом.
