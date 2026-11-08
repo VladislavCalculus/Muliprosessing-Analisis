@@ -1,6 +1,6 @@
 # Фактичний стан MLT-5 та shared contract
 
-Це опис поточного коду, не всієї задуманої системи. У цьому repository реалізований MLT-5 та його контракт із майбутнім MLT-4. Джерела: [`../README.md`](../README.md), [`../src/signal_proc/processing.py`](../src/signal_proc/processing.py), [`../src/audio_contracts/packets.py`](../src/audio_contracts/packets.py), [`../pyproject.toml`](../pyproject.toml).
+Це опис поточного коду `main`, не всієї задуманої системи. У `main` реалізований MLT-5 та його контракт із MLT-4; окремий candidate branch `origin/mlt-4-wav` описаний нижче й ще не інтегрований у `main`. Джерела: [`../README.md`](../README.md), [`../src/signal_proc/processing.py`](../src/signal_proc/processing.py), [`../src/audio_contracts/packets.py`](../src/audio_contracts/packets.py), [`../pyproject.toml`](../pyproject.toml).
 
 ## Пакети Python
 
@@ -22,7 +22,7 @@
 - `frame_count`, `channel_count`, `duration_seconds` обчислюються з масиву та sample rate.
 - `to_payload()` додає schema/id/rate/derived fields; `samples` лишається NumPy array, тож payload не є чистим JSON.
 
-`AudioReadError(source_id, error_code, message, source_name=None, schema_version=1)` є результатом невдалого WAV читання. `AudioReadResult` — union успішного і невдалого читання. Це DTO є в коді; реальний модуль MLT-4 поки відсутній.
+`AudioReadError(source_id, error_code, message, source_name=None, schema_version=1)` є результатом невдалого WAV читання. `AudioReadResult` — union успішного і невдалого читання. Ці DTO є в `main`; reader реалізований окремо в `origin/mlt-4-wav`, але ще не інтегрований.
 
 ## `process_signal` API
 
@@ -87,8 +87,14 @@ process_signal(
 
 Dataclass та ndarray pickle-compatible для process queue. `to_payload()` є shallow mapping; JSON adapter має окремо вирішити, як зберігати/посилати великі масиви. SignalPacket повертає той самий source identity, щоб aggregator з’єднав результат із правильним файлом при out-of-order worker completion.
 
+## Candidate MLT-4 на `origin/mlt-4-wav` — 2026-11-08
+
+У commit `94e9145` модуль `src/audio_io/` містить `WavSource`, `WavFile`, `read_wav_details`, `read_wav` і `read_wav_batch`. Reader спершу перевіряє RIFF/WAVE chunk bounds, format fields, frame alignment і довжину, потім декодує через `scipy.io.wavfile.read`; результат зіставляє з header metadata і повертає `AudioPacket` або per-file `AudioReadError`. `read_wav_details` додатково повертає bit depth та encoding. Декларована підтримка — PCM 8/16/24/32 і IEEE float 32/64; автоматичні fixture tests перевіряють лише PCM16.
+
+Batch API зберігає input order і не перериває подальше читання через file error. Він не запускає паралельні workers. `python -m audio_io` є CLI оглядом, не інтегрованим MLT-3 UI. Ці факти стосуються окремої remote гілки, не `main`.
+
 ## Межі та відомі обмеження
 
 - MLT-5 не читає WAV, не показує графіки, не запускає worker pool, не пише аудіофайли.
-- Основний продукт у поточному checkout не має коду MLT-4/2/3; див. `architecture.md` і `status.md`.
+- `main` не має коду MLT-4/2/3; окремий MLT-4 candidate описаний вище. Див. `architecture.md` і `status.md`.
 - Schema v1 і API описують наявний пакетний контракт. Будь-які модифікації мають бути узгоджені в `data_contract.md` і у всіх споживачів.

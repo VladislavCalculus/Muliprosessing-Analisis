@@ -132,11 +132,11 @@ PR4 каже, що модулі ще не були реалізовані на �
 
 Виправлено: частотний діапазон тепер задає reference maximum для threshold; фізична мінімальна відстань застосовується лише після формування та фільтрації кандидатів. Обидва сценарії повторно пройшли, повернувши відповідно 1000 Hz/0.02 і 505 Hz/0.5. Синтаксичну компіляцію двох пакетних модулів також перевірено через `.venv/bin/python -m py_compile`.
 
-Жоден Jira Bug не створювався: MLT-32/33 не відтворилися на поточному коді, а запит користувача був лише на аналіз. MLT-30/31 про WAV parsing не перевірені, оскільки WAV reader у checkout відсутній. Історичний low-pass bug-report перевірено критеріями PR3 TC-03; зазначені там attenuation thresholds пройдені.
+Жоден Jira Bug не створювався: MLT-32/33 не відтворилися на MLT-5 коді, а запит користувача був лише на аналіз. На момент цього MLT-5 audit MLT-4 WAV reader був відсутній у `main`, тому MLT-30/31 parsing не перевіряли. Окремий branch review виконаний нижче. Історичний low-pass bug-report перевірено критеріями PR3 TC-03; зазначені там attenuation thresholds пройдені.
 
 ## Окрема задача: unit suite для `signal_proc` — виконано у визначеному scope
 
-Live Jira MLT-14 (`Створити unit-тести`) має status `To Do`, parent MLT-1 і на момент знімка не був призначений поточному API-акаунту; користувач окремо доручив цю задачу. Опис MLT-14 згадує також WAV parser, але такого модуля немає, тому поточний suite обмежено обраним MLT-5 `signal_proc` API та його `AudioPacket` boundary.
+Live Jira MLT-14 (`Створити unit-тести`) має status `To Do`, parent MLT-1 і на момент знімка не був призначений поточному API-акаунту; користувач окремо доручив цю задачу. Опис MLT-14 також згадує WAV parser; тодішній suite обмежено `signal_proc` та його `AudioPacket` boundary. Окремий WAV-reader candidate і його тести на `origin/mlt-4-wav` оцінені нижче.
 
 - Framework: `pytest`; test files розташовані в `test/`, host-only runner — `python3 test/run_tests.py`.
 - Assertion forms: стандартний `assert`, `pytest.approx`, `pytest.raises`, `numpy.testing` та mock call assertions.
@@ -146,10 +146,22 @@ Live Jira MLT-14 (`Створити unit-тести`) має status `To Do`, par
 - Десять кейсів покривають: MLT-32/33 частотну роздільність і порядок піків; stereo канали; реальні low/high-pass фільтри; два test doubles; signed/unsigned PCM; непарний FFT; Nyquist/silence/one-frame; threshold/range/separation/max peaks; валідацію; payload/pickle.
 - Попередній 45-кейсовий набір знайшов дефект Nyquist endpoint: для 4 kHz при `fs=8 kHz` два останні Hann bins мали однакову амплітуду, але endpoint не додавався. Виправлено production code (`>` → `>=`); регресія лишилася серед 10 кейсів. Поточний test-file hash до і після запусків збігається.
 - Coverage.py 7.17.2 із branch measurement: загалом 97%; `signal_proc/__init__.py` 100%, `processing.py` — 154 statements (4 пропущені) та 56 branches (3 частково покриті). Пропуски: zero-gain window fallback, частотна межа без жодного bin і відхилення in-range піка через separation. Scope — `signal_proc`, не internals `audio_contracts` і не WAV reader.
-- Незалежний read-only review оновленого 10-кейсового suite пройшов без blocker/high findings: очікувані числові значення, assertions і обидва test doubles підтверджені. Повне Jira MLT-14 completion лишається заблокованим відсутністю WAV parser, якщо цей критерій обов’язковий.
-- `test/README.md` описує команди й поточне coverage. `pyproject.toml` містить optional pytest/coverage dependencies та configuration. WAV parser не тестується, бо MLT-4 відсутній.
-- Jira Done не виставлявся: опис MLT-14 також згадує WAV parser, якого немає в checkout; користувач звузив цю реалізацію до наявного `signal_proc` модуля.
+- Незалежний read-only review оновленого 10-кейсового suite пройшов без blocker/high findings: очікувані числові значення, assertions і обидва test doubles підтверджені. Цей suite сам по собі покриває лише `signal_proc`; WAV reader окремо тестується в candidate branch нижче.
+- `test/README.md` описує команди й поточне coverage. `pyproject.toml` містить optional pytest/coverage dependencies та configuration.
+- Jira Done не виставлявся під час `signal_proc` задачі; повний acceptance MLT-14 і пов’язаний статус звіряй за live Jira після інтеграції WAV-reader branch.
 - Методичні джерела: [pytest assertions and approximate comparisons](https://docs.pytest.org/en/stable/how-to/assert.html), [pytest parametrization](https://docs.pytest.org/en/stable/how-to/parametrize.html), [Python `unittest.mock`](https://docs.python.org/3/library/unittest.mock.html), [Coverage.py quick start and branch coverage](https://coverage.readthedocs.io/en/latest/), [SciPy Hann window](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.windows.hann.html).
+
+## Review remote branch MLT-4 — 2026-11-08
+
+Перевірено `origin/mlt-4-wav` (`0a36a7e` reader, `94e9145` test reduction) проти live Jira issues другого розробника: MLT-4 Epic In Progress; MLT-6/7/8, MLT-26/27, MLT-30/31 — To Do. Jira не змінювали.
+
+- Статичне зіставлення: `WavSource`/`read_wav_batch` реалізують перелік файлів і ordered per-file results (MLT-6); `read_wav_details` дає sample rate, channels, samples, derived duration і WAV-specific bit depth/encoding (MLT-7); `read_wav`/CLI дають single-file read із typed errors (MLT-8/26). `AudioPacket`/`AudioReadError` відповідають чинному `audio_contracts` schema.
+- MLT-27 виконано частково: batch продовжується після помилки, але `read_wav_batch` і CLI працюють послідовно. Паралельна обробка з criterion не реалізована цією гілкою; reader сам зазначає, що worker scheduling належить MLT-2.
+- MLT-30 test ставить звичайний текстовий файл між двома WAV і перевіряє продовження. Він не створює структурно валідний, але truncated WAV, хоча `docs/MLT4.md` описує такий випадок. MLT-31 перевіряє zero-byte `empty.wav` → `empty_audio`.
+- Код і документація заявляють PCM 8/16/24/32 та IEEE float32/64; fixture tests генерують лише PCM16. Static review не виявив певного decoding defect; решта форматів і truncated-WAV test coverage не доведені.
+- Проєктний suite: 18 passed за 1.75 s, включно з 8 MLT-4 і 10 MLT-5 pytest cases. Команда з окремого worktree: `PYTHONPATH=src python -m pytest -p no:cacheprovider test`. Перший звичайний запуск теж дав 18 passed, але з cache-permission warning; повтор без cache provider завершився чисто.
+
+Це read-only review: кандидатна гілка не змінювалася, Jira статуси не переводилися. MLT-27 parallelism лишається питанням scope/реалізації перед Done.
 
 ## Призупинення, артефакти й ризики
 

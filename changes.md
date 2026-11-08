@@ -1,5 +1,11 @@
 # Дайджест змін
 
+## 2026-11-08 — переглянуто `mlt-4-wav` проти Jira другого розробника
+
+- Виявлено та fetch-нуто `origin/mlt-4-wav` (`94e9145`, після реалізації `0a36a7e`). Live REST JQL у MLT показав MLT-4 Epic `In Progress`, а MLT-6/7/8, MLT-26/27, MLT-30/31 — `To Do` для іншого розробника.
+- Candidate branch додає `audio_io`, header/bounds validation, single-file decoding, ordered per-file batch errors і CLI. Незалежний статичний review не знайшов певного decode bug.
+- Відкрите: MLT-27 паралельність відсутня; MLT-30 test не перевіряє structurally truncated WAV; заявлені PCM8/24/32 та IEEE float32/64 не мають fixture tests. 18 pytest cases пройшли (`PYTHONPATH=src python -m pytest -p no:cacheprovider test`); Jira не змінювали.
+
 ## 2026-11-08 — unit suite скорочено до 10 тестів за уточненням користувача
 
 - Новий test file містить рівно 10 pytest cases; до запуску `pytest --collect-only` підтвердив кількість, а очікування звірено з реалізацією, Jira MLT-32/33 та числовими характеристиками FFT/фільтрів/PCM. Результат: 10 passed; test source не змінювався після першого запуску.

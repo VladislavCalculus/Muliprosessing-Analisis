@@ -38,6 +38,19 @@
 - MLT-23/24/25 мають acceptance criteria в описах; технічні задачі MLT-9/10/11 містять короткі описи реалізації без окремих acceptance fields. MLT-32/33 позначені в описах як potential/not tested; точні критерії виконано вручну на поточному коді, обидва очікувані сигнали пройшли (`testing.md`).
 - Jira не змінювали: це був read-only аналіз, тож статуси залишилися такими, як повернув API.
 
+## Live open MLT-4 assignments — 2026-11-08
+
+Project-scoped Jira Cloud REST query `project = MLT AND statusCategory != Done AND assignee IS NOT EMPTY` повернув 17 відкритих призначених issues. Вісім issues, які стосуються MLT-4, належать іншому розробнику; ідентифікаційні дані користувачів у KB не зберігаються.
+
+| Issue | Status під час запиту |
+| --- | --- |
+| MLT-4 Epic | In Progress |
+| MLT-6, MLT-7, MLT-8 | To Do |
+| MLT-26, MLT-27 | To Do |
+| MLT-30, MLT-31 | To Do |
+
+Acceptance criteria та branch mapping наведені в `backlog.md` і `testing.md`. Jira залишилася read-only.
+
 ## Історичні звіти проти live Jira
 
 - `backlog.md` та `testing.md` зберігають вимоги, тест-план, ключі задач і статуси, видимі у переданих звітах/screenshots. Для цих записів зберігай дату й маркуй їх як історичні.

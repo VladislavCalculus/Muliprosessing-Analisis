@@ -104,3 +104,20 @@ Jira REST board 3 повернув `Sprint 1: Fundamentals` (ID 1) як `active`
 У плані цільовим форматом є WAV. Розподілена обробка між комп’ютерами через мережу не визначена. Створення/запис нового аудіофайла не є окремою функцією. Перевірка, що фільтрація не змінює оригінал, є вимогою.
 
 Поточний checkout містить MLT-5. Наявність issue в цій карті не означає, що відповідний модуль чи Jira-задачу реалізовано/закрито.
+
+## Live MLT-4 assignments і branch comparison — 2026-11-08
+
+Jira Cloud REST JQL `project = MLT AND statusCategory != Done AND assignee IS NOT EMPTY` повернув 17 відкритих призначених issues; 8 MLT-4-related issues належать іншому розробнику. Відкриті Jira statuses не змінювалися.
+
+| Jira | Jira status | Перевірка проти `origin/mlt-4-wav@94e9145` |
+| --- | --- | --- |
+| MLT-4 Epic | In Progress | `audio_io` реалізує WAV reading і per-file errors |
+| MLT-6 Task | To Do | `WavSource`/`read_wav_batch` та CLI приймають кілька джерел послідовно |
+| MLT-7 Task | To Do | Витягуються sample rate, channels, frame-derived duration, samples; details додають bit depth/encoding |
+| MLT-8 Task | To Do | Один WAV читається з typed error path |
+| MLT-26 Story | To Do | Читання та відмова на некоректному вмісті є; інтегрований UI тут не реалізований |
+| MLT-27 Story | To Do | Помилка одного файла не зупиняє batch; паралельне виконання не реалізоване в цій гілці |
+| MLT-30 Bug | To Do | Batch continuation покритий тестом з не-WAV bytes; structurally truncated WAV fixture відсутній |
+| MLT-31 Bug | To Do | Zero-byte WAV повертає `empty_audio`; цей сценарій тестується |
+
+Точні Jira описи і факт, що паралельність належить також worker-orchestration scope, звіряй із live Jira та `architecture.md`. Наявність коду не переводить issue у Done.
