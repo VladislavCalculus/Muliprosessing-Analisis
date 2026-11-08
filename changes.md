@@ -1,5 +1,11 @@
 # Дайджест змін
 
+## 2026-11-08 — unit suite скорочено до 10 тестів за уточненням користувача
+
+- Новий test file містить рівно 10 pytest cases; до запуску `pytest --collect-only` підтвердив кількість, а очікування звірено з реалізацією, Jira MLT-32/33 та числовими характеристиками FFT/фільтрів/PCM. Результат: 10 passed; test source не змінювався після першого запуску.
+- Coverage.py 7.17.2: 97% combined statement/branch coverage для `signal_proc` (154 statements, 56 branches; 4 пропущені statements, 3 partial branches). Пропуски описані в `testing.md` і `test/README.md`.
+- Незалежний review не знайшов blocker/high findings для 10 кейсів. Nyquist production fix збережений; зайву однокадрову coverage-only умову повернуто до попередньої перевірки за сумою вікна. Jira MLT-14 не переведено у Done, бо issue також згадує відсутній WAV parser.
+
 ## 2026-11-08 — MLT-5 unit suite пройшов із 100% statement/branch coverage
 
 - Додано 45 pytest cases для конфіг-валідації, PCM, low/high-pass, even/odd FFT, Nyquist, peak threshold/range/separation, stereo, input immutability, payload і pickle. Два test doubles — SOS stub і `unittest.mock.Mock`; різні assertion APIs описані у `test/README.md`.

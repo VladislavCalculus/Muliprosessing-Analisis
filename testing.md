@@ -134,7 +134,7 @@ PR4 каже, що модулі ще не були реалізовані на �
 
 Жоден Jira Bug не створювався: MLT-32/33 не відтворилися на поточному коді, а запит користувача був лише на аналіз. MLT-30/31 про WAV parsing не перевірені, оскільки WAV reader у checkout відсутній. Історичний low-pass bug-report перевірено критеріями PR3 TC-03; зазначені там attenuation thresholds пройдені.
 
-## Окрема задача: unit suite для `signal_proc` — виконано
+## Окрема задача: unit suite для `signal_proc` — виконано у визначеному scope
 
 Live Jira MLT-14 (`Створити unit-тести`) має status `To Do`, parent MLT-1 і на момент знімка не був призначений поточному API-акаунту; користувач окремо доручив цю задачу. Опис MLT-14 згадує також WAV parser, але такого модуля немає, тому поточний suite обмежено обраним MLT-5 `signal_proc` API та його `AudioPacket` boundary.
 
@@ -142,13 +142,13 @@ Live Jira MLT-14 (`Створити unit-тести`) має status `To Do`, par
 - Assertion forms: стандартний `assert`, `pytest.approx`, `pytest.raises`, `numpy.testing` та mock call assertions.
 - Test doubles: `butter_stub` повертає контрольовані SOS sections, а `unittest.mock.Mock` для `sosfilt` перевіряє виклик і віддає заданий вихід. Окремі numeric tests продовжують використовувати справжню SciPy реалізацію.
 - Coverage: Coverage.py з branch measurement через `coverage run --branch --source=signal_proc -m pytest test`, далі `coverage report -m`; pytest-cov не потрібен.
-- Test source статично скомпільовано й переглянуто до першого запуску. Фінальний test suite зібрав 45 cases; усі 45 пройшли на Python 3.13.7, pytest 9.2.0, NumPy 2.5.4, SciPy 1.18.1.
-- Перший запуск виявив справжній кодовий дефект у Nyquist endpoint: для чистого 4 kHz тону при `fs=8 kHz` останні два Hann-віконні bins мали рівні амплітуди, а код не додавав endpoint і повертав порожній список. Код виправили (`>` → `>=`); тести не змінювали. Наступний запуск пройшов 45/45.
-- Перевірка coverage виявила, що однокадровий fallback не мав окремої умови, бо `hann(1, sym=False)` уже повертає одиничне вікно. Код явно обробляє один кадр і використовує одиничне вікно; на числовий результат це не впливає, а тест перевіряє нульовий спектр без помилки нормалізації.
-- Coverage.py 7.17.2 із branch measurement: `signal_proc/__init__.py` 100%; `signal_proc/processing.py` 154/154 statements, 56/56 branches; загалом 100% coverage, 0 missing lines/branches.
-- Незалежний read-only review пройшов без blocker/high зауважень для вибраного `signal_proc`; expected values, DSP assertions, двійники й MLT-32/33 кейси визнані обґрунтованими. Coverage scope — тільки `signal_proc`, не internals `audio_contracts` і не WAV reader.
-- `test/README.md` описує commands; `pyproject.toml` містить optional pytest/coverage dependencies і coverage configuration. Точні Jira MLT-32/33 кейси включені. WAV parser не тестується, бо MLT-4 модуль відсутній.
-- Jira Done не виставлявся: опис MLT-14 також згадує WAV parser, а такого модуля в checkout немає; користувач звузив цю реалізацію до наявного `signal_proc` модуля.
+- Перед запуском тестовий файл скомпільовано та `pytest --collect-only` підтвердив рівно 10 кейсів. Очікування звірено статично за API, Jira acceptance прикладами та numeric results. На Python 3.13.7/pytest 9.2.0 фактичний результат — 10/10 за 1.97 s.
+- Десять кейсів покривають: MLT-32/33 частотну роздільність і порядок піків; stereo канали; реальні low/high-pass фільтри; два test doubles; signed/unsigned PCM; непарний FFT; Nyquist/silence/one-frame; threshold/range/separation/max peaks; валідацію; payload/pickle.
+- Попередній 45-кейсовий набір знайшов дефект Nyquist endpoint: для 4 kHz при `fs=8 kHz` два останні Hann bins мали однакову амплітуду, але endpoint не додавався. Виправлено production code (`>` → `>=`); регресія лишилася серед 10 кейсів. Поточний test-file hash до і після запусків збігається.
+- Coverage.py 7.17.2 із branch measurement: загалом 97%; `signal_proc/__init__.py` 100%, `processing.py` — 154 statements (4 пропущені) та 56 branches (3 частково покриті). Пропуски: zero-gain window fallback, частотна межа без жодного bin і відхилення in-range піка через separation. Scope — `signal_proc`, не internals `audio_contracts` і не WAV reader.
+- Незалежний read-only review оновленого 10-кейсового suite пройшов без blocker/high findings: очікувані числові значення, assertions і обидва test doubles підтверджені. Повне Jira MLT-14 completion лишається заблокованим відсутністю WAV parser, якщо цей критерій обов’язковий.
+- `test/README.md` описує команди й поточне coverage. `pyproject.toml` містить optional pytest/coverage dependencies та configuration. WAV parser не тестується, бо MLT-4 відсутній.
+- Jira Done не виставлявся: опис MLT-14 також згадує WAV parser, якого немає в checkout; користувач звузив цю реалізацію до наявного `signal_proc` модуля.
 - Методичні джерела: [pytest assertions and approximate comparisons](https://docs.pytest.org/en/stable/how-to/assert.html), [pytest parametrization](https://docs.pytest.org/en/stable/how-to/parametrize.html), [Python `unittest.mock`](https://docs.python.org/3/library/unittest.mock.html), [Coverage.py quick start and branch coverage](https://coverage.readthedocs.io/en/latest/), [SciPy Hann window](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.windows.hann.html).
 
 ## Призупинення, артефакти й ризики
