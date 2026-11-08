@@ -7,7 +7,7 @@
 - `origin/main` на `f73be7c` містить merge commit `85ce596` для MLT-4 reader. `db974ab` (додатковий HTTP pipeline) скасовано звичайним revert-комітом `f73be7c` на прохання користувача; код `audio_pipeline` у поточному tree відсутній.
 - У `main` реалізовані `audio_contracts`, `audio_io` (MLT-4 WAV reader) і `signal_proc` (MLT-5). Reader повертає `AudioPacket` або `AudioReadError`; `process_signal` виконує integer PCM → float64, optional Butterworth low/high-pass, Hann-window one-sided FFT та per-channel peak detection.
 - Editable package build і компіляція Python-файлів проходили після зміни package layout; wheel build (`pip wheel --no-deps --no-build-isolation .`, setuptools 84.2.1) успішна. Коміт `fadd1ec` містить range/separation fix. Поточний suite має 10 pytest cases, 10/10 пройшли; Coverage.py для `signal_proc` — 97% combined statement/branch coverage (154 statements, 56 branches; 4 statements пропущені, 3 гілки частково покриті). У `src/signal_proc/processing.py` залишено Nyquist endpoint fix; coverage-only однокадрову зміну прибрано.
-- Merge `mlt-4-wav` пройшов без конфліктів; на самій гілці до merge було 18/18 tests. `read_wav_batch` послідовний. MLT-2 worker pool, MLT-3 UI, formats besides tested PCM16 і structurally truncated WAV fixture лишаються відкритими.
+- Merge `mlt-4-wav` пройшов без конфліктів; після merge повторно пройшли 18/18 tests. `read_wav_batch` послідовний. MLT-2 worker pool, MLT-3 UI, formats besides tested PCM16 і structurally truncated WAV fixture лишаються відкритими.
 
 ## Контракт модулів
 
@@ -25,7 +25,7 @@
 - Для вибраних MLT задач зафіксовано рольовий delivery workflow: live fetch, реалізація, незалежний review, evidence-based Bug creation і перевірений terminal transition. Точні локальні Codex agent TOML/MCP filters зберігаються лише в ignored `.codex/`; фактичний Jira status workflow ще треба звірити під час першої операції.
 - Під час попереднього Sprint 1 огляду Jira issues не створювалися й статуси не змінювалися; тоді 8 issues, призначених автентифікованому акаунту, повернули `To Do`. У цьому branch review також не було Jira writes.
 - 12 test cases, 18 checklist пунктів і 4 potential bugs описані в `testing.md`. MLT-32/33 numeric replay пройшов; після merge MLT-4 у suite є reader tests для invalid і zero-byte WAV, але fixture structurally truncated WAV лишається відсутнім.
-- `main` містить `audio_contracts`, `audio_io`, `signal_proc`; suite має 18 cases (6 reader, 2 CLI, 10 DSP). Попередній прогін окремої гілки завершився 18/18; у цій merge-only роботі suite повторно не запускався. MLT-5 coverage — раніше виміряні 97% у його окремому scope.
+- `main` містить `audio_contracts`, `audio_io`, `signal_proc`; suite має 18 cases (6 reader, 2 CLI, 10 DSP), командою `python -m pytest -p no:cacheprovider test -q` після merge отримано 18 passed. Окремий двотермінальний loopback smoke: 8000 Hz mono, 8000 frames, 440 Hz peak. MLT-5 coverage — раніше виміряні 97% у його окремому scope.
 - Глобальний поріг допустимої похибки DSP і мінімальний speedup не визначені; не вводити їх як прийняті критерії без рішення команди.
 
 ## Git і база знань

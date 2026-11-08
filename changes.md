@@ -1,5 +1,10 @@
 # Дайджест змін
 
+## 2026-11-08 — two-terminal smoke підтвердив AudioPacket → MLT-5 без нових файлів
+
+- Тимчасовий PCM16/8000 Hz/440 Hz fixture створено FFmpeg; Ncat через `127.0.0.1` передав pickle `AudioPacket` із першого процесу до другого, де `process_signal` повернув 440 Hz, 8000 frames/1.0 s і amplitude `0.12497339495662549`. Це тільки smoke transport, не application protocol; у repository файлів не додано.
+- Після merge `mlt-4-wav` повний suite повторно пройшов: 18 passed за 4.62 s. Jira та main code не змінювалися. Див. точний evidence/межі в `testing.md`.
+
 ## 2026-11-08 — MLT-4 WAV reader злито в main без додаткового pipeline
 
 - `mlt-4-wav` merged у `main` commit `85ce596` без конфліктів; remote `main` на `f73be7c` підтверджений. Додатковий `audio_pipeline` commit `db974ab` скасований новим revert-комітом за звуженим запитом користувача; цей код, CLI і чотири pipeline tests відсутні у поточному tree.
