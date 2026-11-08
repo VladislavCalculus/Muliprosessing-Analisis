@@ -18,3 +18,5 @@
 ## Межа Git
 
 Ця папка — окремий вкладений Git-репозиторій на orphan-гілці `kb-only`; він містить тільки KB і не входить до гілок коду. `origin` вказує на GitHub remote проєкту, але публікуй цей репозиторій тільки в гілку `kb-only`, ніколи в `main`. Перевіряй стан командою `git -C knowledge-base status --short --branch`.
+
+У свіжому clone гілки `main` KB не буде. Віднови її командою `git clone --single-branch --branch kb-only https://github.com/VladislavCalculus/Muliprosessing-Analisis.git knowledge-base`; перед редагуванням перевір, що активна гілка саме `kb-only`.
