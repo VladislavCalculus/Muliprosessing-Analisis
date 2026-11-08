@@ -1,51 +1,32 @@
-# MLT-5 unit tests
+# MLT-4 and MLT-5 tests
 
-This directory contains host-only unit tests for the `signal_proc` package. The
-selected module accepts `AudioPacket` objects; WAV parsing is not included
-because the repository does not yet contain an MLT-4 reader.
+Тести навмисно залишені компактними: перевіряються основні сценарії, потрібні
+для модуля MLT-4, без великої кількості рідкісних крайових випадків.
 
-The suite contains exactly 10 collected pytest cases covering FFT/peak
-behavior, channels, real filters, test doubles, PCM conversion, edge cases,
-validation, and payload/pickle behavior.
+У наборі **18 pytest-перевірок**:
+- 6 перевірок читання WAV у `test_audio_io.py`;
+- 2 перевірки консольного запуску в `test_audio_io_cli.py`;
+- 10 наявних перевірок математичного модуля MLT-5 у `test_signal_proc.py`.
 
-## Install and run
+## Що перевіряє MLT-4
 
-From the repository root, activate the project virtual environment, then run:
+1. правильний mono WAV: 8000 Гц, 1 канал, 16 біт, 1 с;
+2. правильний stereo WAV: 16000 Гц, 2 канали, 16 біт, 2 с;
+3. пошкоджений файл між двома правильними не зупиняє останній файл;
+4. порожній файл повертає `empty_audio`;
+5. відсутній файл повертає `read_failed`;
+6. прочитаний WAV передається в реальний MLT-5 і для тону 440 Гц знаходиться пік;
+7. консоль показує параметри правильного файла;
+8. консоль показує помилку середнього файла й усе одно читає наступний.
+
+## Запуск
+
+З кореня проєкту:
 
 ```sh
-source .venv/bin/activate
 python -m pip install -e '.[test]'
-python test/run_tests.py
+python -m pytest test
 ```
 
-The suite uses synthetic NumPy signals only. It does not access audio files,
-Jira, network services, or hardware.
-
-## Test doubles and assertion styles
-
-`test_signal_proc.py` contains a small Butterworth-construction stub and a
-`unittest.mock.Mock` for the SOS filter call. Together they verify the boundary
-between configuration, filter construction, and returned samples without
-replacing the real DSP tests. The suite also uses ordinary `assert`,
-`pytest.approx`, `pytest.raises`, NumPy array assertions, and Mock call
-assertions.
-
-## Coverage
-
-Coverage.py measures statements and branches in `signal_proc`:
-
-```sh
-python -m coverage run --branch --source=signal_proc -m pytest test
-python -m coverage report -m
-```
-
-For an annotated HTML report, run `python3 -m coverage html` and open
-`htmlcov/index.html`. Coverage is evidence of executed code paths, not proof of
-correctness by itself; review any missing lines against the test scope.
-
-Latest result: **10 passed; 97% combined statement/branch coverage** for
-`signal_proc` (`__init__.py` 100%, `processing.py` 97%). Four statements were
-missed and three branches were partial: the zero-gain window fallback, a
-frequency floor excluding every bin, and an in-range peak rejected by minimum
-separation. WAV parsing and `audio_contracts` internals are outside this
-measurement.
+Ці вісім перевірок MLT-4 є скороченим набором основних сценаріїв.
+Тести MLT-5 залишені без змін.

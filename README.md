@@ -1,8 +1,9 @@
-# MLT-5: цифрова обробка сигналів
+# MLT: читання WAV та цифрова обробка сигналів
 
-Модуль реалізує задачі MLT-23/9 (фільтрація), MLT-24/10 (FFT) та
-MLT-25/11 (пошук домінуючих частот). Він приймає вже декодовані аудіодані:
-читання WAV належить модулю MLT-4. Файлів модуль не змінює.
+У проєкті є два незалежні модулі: `audio_io` (MLT-4) читає WAV-файли,
+а `signal_proc` (MLT-5) фільтрує звук, обчислює спектр і знаходить основні
+частоти. Вони передають дані через `audio_contracts.AudioPacket`.
+Початкові файли не змінюються.
 
 ## Встановлення
 
@@ -13,7 +14,100 @@ python3 -m venv .venv
 .venv/bin/python -m pip install -e .
 ```
 
-## Приклад
+У Windows замість `.venv/bin/python` використовуй `.venv\Scripts\python.exe`.
+
+## MLT-4: швидкий запуск
+
+Показати параметри одного або кількох файлів:
+
+```bash
+.venv/bin/python -m audio_io mono.wav broken.wav stereo.wav
+```
+
+Для кожного файла програма показує успіх і параметри або зрозумілу помилку.
+Після помилки вона переходить до наступного файла. Наприкінці виводиться
+кількість успішних і невдалих читань. Код завершення — `0`, якщо все прочитано,
+і `1`, якщо хоча б один файл не прочитано; обробляються всі передані файли.
+
+Демонстрація без підготовки власних WAV:
+
+```bash
+.venv/bin/python examples/wav_demo.py
+```
+
+Вона створює тимчасові моно, стерео, пошкоджений і порожній файли та показує,
+що після помилки посередині списку правильний стереофайл також читається.
+Очікуваний підсумок: 2 успішні файли й 2 повідомлення про помилки.
+Це консольна демонстрація MLT-4; графічний інтерфейс і керування процесами
+залишаються окремими модулями MLT-3 та MLT-2.
+
+### API читання
+
+```python
+from audio_contracts import AudioReadError
+from audio_io import WavSource, read_wav_batch, read_wav_details
+from signal_proc import process_signal
+
+sources = [
+    WavSource("mono.wav", source_id="selection-1"),
+    WavSource("broken.wav", source_id="selection-2"),
+    WavSource("stereo.wav", source_id="selection-3"),
+]
+for result in read_wav_batch(sources):
+    if isinstance(result, AudioReadError):
+        print(result.source_id, result.message)
+        continue
+    processed = process_signal(result)
+    print(processed.source_id, processed.peaks_by_channel)
+
+# Коли також потрібна розрядність для показу користувачу:
+details = read_wav_details("mono.wav", source_id="metadata-example")
+if not isinstance(details, AudioReadError):
+    print(details.bits_per_sample, details.encoding)
+    print(details.packet.duration_seconds)
+```
+
+`read_wav(path, *, source_id, source_name=None)` повертає `AudioPacket` або
+`AudioReadError`. `read_wav_details(...)` додатково повертає WAV-розрядність і
+кодування в `WavFile`; готовий пакет міститься в `WavFile.packet`.
+Спільний `AudioPacket` залишається без змін. `source_id` задає викликач;
+у межах одного пакета ідентифікатори мають бути різними, навіть якщо назви
+файлів однакові. Дубльований/порожній ID — помилка виклику API (`ValueError`).
+
+`read_wav_batch` читає послідовно й видає результат кожного файла окремо,
+без збереження всіх аудіомасивів усередині модуля. Порожній список означає,
+що файлів не вибрано: результатів немає. Паралельне виконання — задача MLT-2.
+
+### Підтримувані WAV та помилки
+
+- RIFF/WAVE: PCM 8, 16, 24, 32 біти; IEEE float 32 та 64 біти.
+- Моно, стерео й інші кількості каналів зберігаються окремо. Частота
+  дискретизації має бути додатною; 8000 та 16000 Гц — приклади, не обмеження.
+- Розрядність береться із заголовка файла. Наприклад, PCM24 зберігається
+  SciPy в `int32` з вирівнюванням старших бітів; це все ще 24-бітний WAV.
+  MLT-5 правильно нормалізує цей тип. Float зберігає свій масштаб.
+- Вміст перевіряється незалежно від розширення та регістру імені.
+  Допоміжні WAV-блоки з коректною довжиною дозволені.
+- Перевіряються довжини RIFF і блоків, наявність `fmt`/`data`, узгодженість
+  параметрів, повні кадри та кількість реально декодованих кадрів.
+- RIFX, RF64/BW64, WAVE_FORMAT_EXTENSIBLE, стиснені WAV та інші розрядності
+  в цій версії повертають `unsupported_format`.
+
+| Код | Що означає |
+| --- | --- |
+| `empty_audio` | Файл 0 байтів або WAV без звукових кадрів |
+| `invalid_wav` | Неправильний заголовок, обірвані/неузгоджені дані, NaN або Inf |
+| `unsupported_format` | Розпізнаний, але непідтримуваний різновид WAV чи кодування |
+| `read_failed` | Немає файла, немає доступу, шлях до папки або помилка читання |
+
+Докладніше про перевірки й пояснення для захисту: [docs/MLT4.md](docs/MLT4.md).
+
+## MLT-5: цифрова обробка сигналів
+
+Модуль реалізує задачі MLT-23/9 (фільтрація), MLT-24/10 (FFT) та
+MLT-25/11 (пошук домінуючих частот).
+
+### Приклад
 
 ```python
 import numpy as np
@@ -39,23 +133,19 @@ print(packet.peaks_by_channel[0])
 next_stage_payload = packet.to_payload()
 ```
 
-Якщо WAV уже читається через SciPy, інтеграція з етапом MLT-4 виглядає так:
+Читання WAV та передавання його до MLT-5:
 
 ```python
-from pathlib import Path
-from scipy.io import wavfile
-from audio_contracts import AudioPacket
+from audio_contracts import AudioReadError
+from audio_io import read_wav
 from signal_proc import process_signal
 
-path = Path("example.wav")
-sample_rate, samples = wavfile.read(path)
-input_packet = AudioPacket(
-    source_id=str(path.resolve()),
-    source_name=path.name,
-    sample_rate_hz=sample_rate,
-    samples=samples,
-)
-packet = process_signal(input_packet)
+input_packet = read_wav("example.wav", source_id="example-1")
+if isinstance(input_packet, AudioReadError):
+    print(input_packet.message)
+else:
+    packet = process_signal(input_packet)
+    print(packet.peaks_by_channel)
 ```
 
 ## Контракт між читанням файлів і DSP
