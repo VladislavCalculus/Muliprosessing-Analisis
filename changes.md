@@ -112,3 +112,10 @@
 - Coverage.py 7.17.2 повторно запущено з окремим тимчасовим data file, щоб не змінювати існуючий `.coverage`: 10 passed за 3.23 s; 97% combined statement/branch coverage; 4 непокриті statements і 3 partial branches.
 - Google Classroom plugin/connector не знайдений через Plugin Management; документ залишений локально готовим до подання. Jira не запитувалась і не змінювалась.
 - Перший `git fetch` у звичайному sandbox був заблокований OS permission error під час запису `FETCH_HEAD`; авторизований fetch перед публікацією пройшов, remote тоді був `5e9af55`. Коміт `e88fbd7` успішно запушено в `origin/kb-only`; `git ls-remote` підтвердив той самий повний hash.
+
+
+## 2026-11-08 — протокол розширено на MLT-4 та MLT-5
+
+- На уточнення користувача актуальний `docs/MLT4_MLT5_unit_test_protocol.docx` замінив попередній MLT-5-only варіант і включив `audio_io` (MLT-4) разом із `signal_proc` (MLT-5). У протоколі наведено всі 18 pytest cases: 6 reader, 2 CLI, 10 DSP; повні лістинги 3 test files; інтеграційний WAV → DSP кейс і обидва doubles.
+- Повторний спільний branch coverage run пройшов: 18 passed за 4.42 s. Scope `audio_io,signal_proc`: 87% combined; reader 76%, CLI 94%, DSP 97%. `.coverage` у робочому дереві не перезаписувався. Код і тестові файли не змінювалися.
+- Імена трьох лістингів у DOCX звірені з джерелами рядок у рядок. Classroom upload досі pending через відсутність доступного Google Classroom connector.

@@ -183,10 +183,21 @@ Live Jira MLT-14 (`Створити unit-тести`) має status `To Do`, par
 
 За планом: підготовка 19–22.09.2026; unit 23–27.09; integration 28–30.09; performance 01–02.10; виправлення/regression 02–04.10. Ризики: затримка worker-ів, некоректне завершення процесу, відсутність speedup на малих файлах, брак WAV fixtures, різні версії бібліотек. Це історичні дати, не поточний графік.
 
-## Протокол unit-тестування `signal_proc` — 2026-11-08
+## Протокол unit-тестування MLT-4 та MLT-5 — 2026-11-08
 
-Для навчальної вимоги підготовлено DOCX `docs/MLT5_unit_test_protocol.docx`. Документ містить постановку тестування, таблицю всіх 10 тестових функцій, різновиди assert, пояснення `butter_stub` і `Mock`-двійників, команду Coverage.py, оцінку покриття та повний лістинг `test/test_signal_proc.py` (258 рядків). Лістинг у DOCX звірено з тестовим файлом рядок у рядок.
+Початковий MLT-5-only протокол розширено після уточнення користувача: актуальний DOCX `docs/MLT4_MLT5_unit_test_protocol.docx` охоплює обидва модулі. Він включає test cases і source listings `test/test_audio_io.py` (6 pytest cases, враховуючи mono/stereo parametrization), `test/test_audio_io_cli.py` (2 cases) та `test/test_signal_proc.py` (10 cases). Один із MLT-4 tests проходить успішний `AudioPacket` через реальний MLT-5, знаходячи тон 440 Hz. У документі містяться різні assert styles та повні лістинги всіх 3 test files.
 
-Поточний повторний вимір 2026-11-08: Python 3.13.7, pytest 9.2.0, Coverage.py 7.17.2; 10 tests passed за 3.23 s. Команда запуску: `COVERAGE_FILE=/private/tmp/kp4-signalproc-report.coverage .venv/bin/python -m coverage run --branch --source=signal_proc -m pytest -p no:cacheprovider -q test/test_signal_proc.py`; потім `COVERAGE_FILE=/private/tmp/kp4-signalproc-report.coverage .venv/bin/python -m coverage report -m`. Coverage — 97% combined statement/branch у `signal_proc`: 156 statements, 4 пропущено; 56 branches, 3 частково покриті. Непокриті випадки: zero-gain window fallback, порожній частотний діапазон і відхилення піка через separation. Тести та production code під час підготовки протоколу не змінювались.
+Повторне вимірювання 2026-11-08: Python 3.13.7, pytest 9.2.0, NumPy 2.5.4, SciPy 1.18.1, Coverage.py 7.17.2. Повна команда: `COVERAGE_FILE=/private/tmp/kp4-two-module.coverage .venv/bin/python -m coverage run --branch --source=audio_io,signal_proc -m pytest -p no:cacheprovider -q test`; після неї `COVERAGE_FILE=/private/tmp/kp4-two-module.coverage .venv/bin/python -m coverage report -m`. Результат — **18 passed за 4.42 s**.
 
-Classroom upload не виконано: у доступних інтеграціях не знайдено Google Classroom конектора; наявний Google Drive не є завантаженням у конкретне завдання курсу. DOCX готовий для ручного подання. Jira не потрібна для формування цього протоколу; актуальний issue status не перевірявся.
+| Файл | Statements | Miss | Branches | Partial | Combined coverage |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `audio_io/__init__.py` | 2 | 0 | 0 | 0 | 100% |
+| `audio_io/__main__.py` | 26 | 1 | 6 | 1 | 94% |
+| `audio_io/reader.py` | 137 | 25 | 56 | 22 | 76% |
+| `signal_proc/__init__.py` | 2 | 0 | 0 | 0 | 100% |
+| `signal_proc/processing.py` | 154 | 4 | 56 | 3 | 97% |
+| **TOTAL** | **321** | **30** | **118** | **26** | **87%** |
+
+Coverage включає `audio_io` (разом з CLI) і `signal_proc`, але не `audio_contracts`. Найбільше непокритих гілок лишається у WAV reader — header/format/identity/error validation paths; точні пропуски наведені в DOCX raw listing. DSP пропуски: zero-gain window fallback, порожній frequency range і peak rejection через separation. Вони є coverage gaps, а не підтвердженими дефектами. Обидва test doubles (`butter_stub`, `Mock` для `sosfilt`) перевіряють межу фільтра у MLT-5 suite; WAV reader tests використовують тимчасові WAV файли й реальну реалізацію.
+
+Під час розширення звіту source code і тести не змінювались. Google Classroom connector не доступний у поточних інтеграціях, тому DOCX лишається готовим до ручного завантаження. Jira status не запитувався, бо для звіту достатньо перевірених repo tests і code coverage.

@@ -6,7 +6,7 @@
 
 - `origin/main` на `f73be7c` містить merge commit `85ce596` для MLT-4 reader. `db974ab` (додатковий HTTP pipeline) скасовано звичайним revert-комітом `f73be7c` на прохання користувача; код `audio_pipeline` у поточному tree відсутній.
 - У `main` реалізовані `audio_contracts`, `audio_io` (MLT-4 WAV reader) і `signal_proc` (MLT-5). Reader повертає `AudioPacket` або `AudioReadError`; `process_signal` виконує integer PCM → float64, optional Butterworth low/high-pass, Hann-window one-sided FFT та per-channel peak detection.
-- Editable package build і компіляція Python-файлів проходили після зміни package layout; wheel build (`pip wheel --no-deps --no-build-isolation .`, setuptools 84.2.1) успішна. Коміт `fadd1ec` містить range/separation fix. Поточний suite має 10 pytest cases, 10/10 пройшли; Coverage.py для `signal_proc` — 97% combined statement/branch coverage (154 statements, 56 branches; 4 statements пропущені, 3 гілки частково покриті). У `src/signal_proc/processing.py` залишено Nyquist endpoint fix; coverage-only однокадрову зміну прибрано.
+- Editable package build, компіляція Python-файлів і wheel build проходили після зміни package layout. Фокусний suite MLT-5 має 10 cases; повний test suite має 18 (8 для MLT-4 `audio_io`, 10 для MLT-5 `signal_proc`). Поточний повний запуск: 18/18 пройшли; combined Coverage.py scope `audio_io,signal_proc` — 87% (audio_io reader 76%, CLI 94%, signal_proc processing 97%). Деталі й пропуски наведені у `testing.md` та протоколі `docs/MLT4_MLT5_unit_test_protocol.docx`.
 - Merge `mlt-4-wav` пройшов без конфліктів; після merge повторно пройшли 18/18 tests. `read_wav_batch` послідовний. MLT-2 worker pool, MLT-3 UI, formats besides tested PCM16 і structurally truncated WAV fixture лишаються відкритими.
 
 ## Контракт модулів
@@ -47,7 +47,9 @@
 
 Звіти й Jira screenshots, надані користувачем, описують теоретичний план, вимоги та знімки стану, а не поточну реалізацію. Код і Git-історію перевіряй у фактичному checkout. Якщо висновок не відтворено/не виміряно, залишай його непідтвердженим.
 
-## Навчальний протокол MLT-5
+## Протокол модульного тестування MLT-4 та MLT-5
 
-- DOCX протокол тестування підготовлено: `docs/MLT5_unit_test_protocol.docx`. Він містить 10 модульних тестів, різновиди assert, обидва test doubles, повний лістинг тестового файлу та Coverage.py result. Дата перевірки — 2026-11-08; повторний запуск: 10/10, 3.23 s; coverage 97% combined statement/branch для `signal_proc`.
-- У поточних доступних конекторах Google Classroom відсутній, тому завантаження у Classroom не зроблено; файл очікує подання користувачем. Jira не перевіряли, оскільки вона не потрібна для точності локального звіту.
+- Актуальний DOCX: `docs/MLT4_MLT5_unit_test_protocol.docx`. У звіт включено обидва модулі — `audio_io`/MLT-4 і `signal_proc`/MLT-5, усі три test-файли, міжмодульний WAV → DSP кейс, кілька assert styles, два DSP test doubles та повний Coverage.py output.
+- Повний suite: 18 passed за 4.42 s. Coverage.py branch mode з `--source=audio_io,signal_proc`: сумарно 321 statements (30 missed), 118 branches (26 partial), 87% combined. Окремо: `audio_io/reader.py` 76%, `audio_io.__main__` 94%, `signal_proc/processing.py` 97%; `__init__.py` обох пакетів 100%.
+- Coverage scope не включає спільний `audio_contracts`; 87% не означає покриття всіх WAV форматів або можливих malformed headers. Тести й production code під час розширення звіту не змінювалися.
+- Classroom upload лишився невиконаним: доступний connector search не знайшов Google Classroom. Jira не потрібна для звіту й не запитувалася.
