@@ -134,6 +134,17 @@ PR4 каже, що модулі ще не були реалізовані на �
 
 Жоден Jira Bug не створювався: MLT-32/33 не відтворилися на поточному коді, а запит користувача був лише на аналіз. MLT-30/31 про WAV parsing не перевірені, оскільки WAV reader у checkout відсутній. Історичний low-pass bug-report перевірено критеріями PR3 TC-03; зазначені там attenuation thresholds пройдені.
 
+## Окрема задача: unit suite для `signal_proc` — підготовлено, ще не запускали
+
+Live Jira MLT-14 (`Створити unit-тести`) має status `To Do`, parent MLT-1 і на момент знімка не був призначений поточному API-акаунту; користувач окремо доручив цю задачу. Опис MLT-14 згадує також WAV parser, але такого модуля немає, тому поточний suite обмежено обраним MLT-5 `signal_proc` API та його `AudioPacket` boundary.
+
+- Framework: `pytest`; test files розташовані в `test/`, host-only runner — `python3 test/run_tests.py`.
+- Assertion forms: стандартний `assert`, `pytest.approx`, `pytest.raises`, `numpy.testing` та mock call assertions.
+- Test doubles: `butter_stub` повертає контрольовані SOS sections, а `unittest.mock.Mock` для `sosfilt` перевіряє виклик і віддає заданий вихід. Окремі numeric tests продовжують використовувати справжню SciPy реалізацію.
+- Coverage: Coverage.py з branch measurement через `coverage run --branch --source=signal_proc -m pytest test`, далі `coverage report -m`; pytest-cov не потрібен.
+- До першого запуску test source статично скомпільовано й переглянуто. Pytest/coverage ще не запускали; незмінні тести будуть виконані після цього design gate. Див. `test/README.md` і `pyproject.toml`.
+- Методичні джерела: [pytest assertions and approximate comparisons](https://docs.pytest.org/en/stable/how-to/assert.html), [pytest parametrization](https://docs.pytest.org/en/stable/how-to/parametrize.html), [Python `unittest.mock`](https://docs.python.org/3/library/unittest.mock.html), [Coverage.py quick start and branch coverage](https://coverage.readthedocs.io/en/latest/).
+
 ## Призупинення, артефакти й ризики
 
 Призупинити тестування, якщо програма не запускається, середовище несправне, немає файлів або блокувальний дефект не дає продовжити. Після виправлення перевірити середовище, повторити невдалий кейс і регресію, зафіксувати фактичний результат.

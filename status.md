@@ -6,7 +6,7 @@
 
 - Гілка проєкту `main` на `origin/main` має коміт `fadd1ec` (`Fix peak filtering within selected frequency range`); попередній `6e6cbb1` (`Ignore project-local Codex configuration`).
 - Реалізовані пакети: `src/audio_contracts/` (`AudioPacket`, `AudioReadError`, `AudioReadResult`) і `src/signal_proc/` (MLT-5). `process_signal` приймає `AudioPacket`; реалізує integer PCM → float64, optional Butterworth low/high-pass, Hann-window one-sided FFT та per-channel peak detection.
-- Editable package build і компіляція вихідних Python-файлів проходили після зміни package layout. У коміті `fadd1ec` виправлено відбір піків у `src/signal_proc/processing.py`; inline числові перевірки PR3 TC-01…12, два регресійні сценарії, Jira MLT-32/33 exact criteria та `py_compile` пройшли. Формальної `tests/` suite у checkout немає.
+- Editable package build і компіляція вихідних Python-файлів проходили після зміни package layout. У коміті `fadd1ec` виправлено відбір піків у `src/signal_proc/processing.py`; inline числові перевірки PR3 TC-01…12, два регресійні сценарії, Jira MLT-32/33 exact criteria та `py_compile` пройшли. Для нової задачі створено pytest suite у `test/`; його перший запуск і coverage measurement ще очікують встановлення optional залежностей.
 - MLT-4 WAV reader, MLT-2 worker orchestration, MLT-3 presentation і MLT-1 test/performance stage у цьому checkout ще не реалізовані. Їхні межі описані як контракт або рекомендований план у `architecture.md`, `data_contract.md` та `decisions.md`.
 
 ## Контракт модулів
@@ -24,7 +24,7 @@
 - Для вибраних MLT задач зафіксовано рольовий delivery workflow: live fetch, реалізація, незалежний review, evidence-based Bug creation і перевірений terminal transition. Точні локальні Codex agent TOML/MCP filters зберігаються лише в ignored `.codex/`; фактичний Jira status workflow ще треба звірити під час першої операції.
 - У цьому аналізі Jira issues не створювалися, status/resolution не змінювалися; усі вісім призначених issues повернули `To Do`. Codex MCP handshake не потрібен для read-only REST fallback.
 - 12 test cases, 18 checklist пунктів і 4 potential bugs описані в `testing.md`. Поточний точний replay MLT-32/33 пройшов; MLT-30/31 лишаються неперевіреними через відсутність WAV reader.
-- Поточний read-only огляд коду підтвердив лише `audio_contracts` і `signal_proc`; директорії `tests/` немає. Один підтверджений edge-case bug у фільтрації піків виправлено; до/після докази й фактичні результати MLT-5 — у `testing.md`.
+- Поточний read-only огляд коду підтвердив лише `audio_contracts` і `signal_proc`; MLT-4 WAV reader не існує. Один підтверджений edge-case bug у фільтрації піків виправлено; до/після докази й фактичні результати MLT-5 — у `testing.md`. Поточний pytest suite у `test/` написаний, але ще не запускався.
 - Глобальний поріг допустимої похибки DSP і мінімальний speedup не визначені; не вводити їх як прийняті критерії без рішення команди.
 
 ## Git і база знань

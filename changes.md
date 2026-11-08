@@ -1,5 +1,12 @@
 # Дайджест змін
 
+## 2026-11-08 — підготовлено pytest suite для `signal_proc` перед першим запуском
+
+- Додано MLT-5 host-only unit suite під `test/`, `python3 test/run_tests.py`, optional test dependencies та line/branch Coverage.py конфігурацію.
+- До запуску вручну звірено expected values з API/алгоритмами, Jira MLT-32/33 acceptance criteria та офіційними pytest/mock/coverage docs. Є різні assert APIs і два test doubles: SOS-construction stub та `Mock` для filtering dependency.
+- Test source статично скомпільовано; pytest і coverage ще не запускали. WAV parser виключений зі scope, бо MLT-4 reader відсутній.
+- Рішення та методичні джерела — у `testing.md`; test entrypoint — у `test/README.md`.
+
 ## 2026-11-08 — використано Jira REST fallback і звірено Sprint 1 tasks з MLT-5
 
 - Після початкової невдалої спроби через MCP/Docker використано наявні project-local credentials через read-only Jira Cloud REST API; автентифікований account збігається з раніше заданим. У project-local інструкціях зафіксовано MLT-scoped REST fallback, тож Docker не потрібен для майбутнього Jira читання.
