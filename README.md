@@ -10,6 +10,7 @@
 | [collaboration.md](collaboration.md) | Обов’язковий pull/edit/merge/push workflow для агентів, паралельних worktree та автоматичного розв’язання конфліктів KB. |
 | [jira.md](jira.md) | Перевірена Jira identity MLT, API/board verification, правила live-status і безпечного зіставлення з кодом. |
 | [architecture.md](architecture.md) | Призначення системи, відповідальність MLT-1…MLT-5, рекомендований потік і теоретичні обмеження. |
+| [mlt2_storage_plan.md](mlt2_storage_plan.md) | Пропозиція п'яти етапів MLT-2 зі сховищем, SQLite/server tradeoff та відкритий нюанс stored procedures для ПЗ. |
 | [backlog.md](backlog.md) | Карта епіків, User Stories, пов’язаних технічних задач і датованих Jira-знімків із наданих звітів. |
 | [data_contract.md](data_contract.md) | Поля, типи, одиниці, інваріанти, помилки, версії та правила передачі масивів між модулями/процесами. |
 | [system.md](system.md) | Фактичні API, алгоритми та обмеження коду, що існує в `main`. |
