@@ -1,10 +1,18 @@
 # Поточний стан
 
-Остання звірка: 2026-11-08, `main@f73be7c` / `origin/main@f73be7c`. Актуальніше локальне дерево завжди перевіряй перед дією.
+Остання звірка: 2026-11-23, `main@5e6ea9c` / `origin/main@5e6ea9c`; remote hash перевірено після успішного push. Актуальніше локальне дерево завжди перевіряй перед дією.
+
+## Останній результат: компактний протокол MLT-5
+
+- `main@5e6ea9c` містить `docs/unit_testing/`: протокол DOCX/PDF/TXT, повні pytest/coverage докази, environment/SHA-256, генератор і його залежності; `test/README.md` оновлено. Наявні 10 DSP тестів та production code не змінювалися.
+- Новий прогін 2026-11-23: MLT-5 **10 passed in 3.13s**, combined coverage **96,70% (97% округлено)**; повний suite **18 passed in 4.63s**. Точні команди, оператори/гілки, пропуски й обсяг — у `testing.md` та `docs/unit_testing/coverage.json`.
+- PDF має 6 сторінок; повний лістинг усіх 10 функцій наявний у DOCX/PDF, верстка переглянута. Правило користувача для майбутніх протоколів: спочатку читати `~/kpi3/kpi4`, зокрема `arh/`; записано також у локальному ignored `AGENTS.md` і `decisions.md`.
+- Попередній `docs/MLT4_MLT5_unit_test_protocol.docx` лишається локальним untracked історичним двомодульним протоколом, його не перезаписано. Старе локальне видалення `tools/build_mlt5_protocol.py` також не включено у новий коміт. Дані розділів нижче від 2026-11-08 є історичними вимірюваннями.
+- Classroom upload не виконано: придатної інтеграції не знайдено. Наступна конкретна дія — завантажити готовий `docs/unit_testing/protocol.pdf` або DOCX у відповідне завдання Classroom. Jira у цій роботі не читали й не змінювали.
 
 ## Перевірена реалізація
 
-- `origin/main` на `f73be7c` містить merge commit `85ce596` для MLT-4 reader. `db974ab` (додатковий HTTP pipeline) скасовано звичайним revert-комітом `f73be7c` на прохання користувача; код `audio_pipeline` у поточному tree відсутній.
+- Поточна `origin/main` містить merge commit `85ce596` для MLT-4 reader. `db974ab` (додатковий HTTP pipeline) скасовано звичайним revert-комітом `f73be7c` на прохання користувача; код `audio_pipeline` у поточному tree відсутній.
 - У `main` реалізовані `audio_contracts`, `audio_io` (MLT-4 WAV reader) і `signal_proc` (MLT-5). Reader повертає `AudioPacket` або `AudioReadError`; `process_signal` виконує integer PCM → float64, optional Butterworth low/high-pass, Hann-window one-sided FFT та per-channel peak detection.
 - Editable package build, компіляція Python-файлів і wheel build проходили після зміни package layout. Фокусний suite MLT-5 має 10 cases; повний test suite має 18 (8 для MLT-4 `audio_io`, 10 для MLT-5 `signal_proc`). Поточний повний запуск: 18/18 пройшли; combined Coverage.py scope `audio_io,signal_proc` — 87% (audio_io reader 76%, CLI 94%, signal_proc processing 97%). Деталі й пропуски наведені у `testing.md` та протоколі `docs/MLT4_MLT5_unit_test_protocol.docx`.
 - Merge `mlt-4-wav` пройшов без конфліктів; після merge повторно пройшли 18/18 tests. `read_wav_batch` послідовний. MLT-2 worker pool, MLT-3 UI, formats besides tested PCM16 і structurally truncated WAV fixture лишаються відкритими.

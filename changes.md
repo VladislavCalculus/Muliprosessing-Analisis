@@ -1,5 +1,11 @@
 # Дайджест змін
 
+## 2026-11-23 — компактний протокол MLT-5 і новий вимір покриття опубліковано
+
+- `main@5e6ea9c` опубліковано в `origin/main`, hashes збігаються. Додано `docs/unit_testing/` з DOCX/PDF/TXT протоколом, повним лістингом 10 наявних тестів, stub/mock, raw pytest/coverage та environment/SHA-256; оновлено `test/README.md`. Production/test source не змінені, попередні локальні зміни збережені.
+- Фактичний прогін: 10 passed in 3.13s; 152/156 операторів, 53/56 переходів, combined 96,70% (97% округлено). Контрольний повний suite: 18 passed in 4.63s. DOCX/PDF structure/listings перевірено, PDF (6 сторінок) переглянуто візуально, compileall/diff checks успішні. Деталі й межі — `testing.md`.
+- Збережено правило користувача про джерела оформлення в `~/kpi3/kpi4/arh/`: `decisions.md`, локальний ignored `AGENTS.md`. Classroom upload лишається невиконаним через відсутність придатної інтеграції; `status.md` містить наступну дію. Jira не змінювали.
+
 ## 2026-11-08 — two-terminal smoke підтвердив AudioPacket → MLT-5 без нових файлів
 
 - Тимчасовий PCM16/8000 Hz/440 Hz fixture створено FFmpeg; Ncat через `127.0.0.1` передав pickle `AudioPacket` із першого процесу до другого, де `process_signal` повернув 440 Hz, 8000 frames/1.0 s і amplitude `0.12497339495662549`. Це тільки smoke transport, не application protocol; у repository файлів не додано.

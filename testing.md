@@ -4,7 +4,7 @@
 
 Джерело тест-плану — TP-MLT-2026-001 v1.1 від 04.10.2026 (звіт PR2). Він описує заплановані перевірки; у звіті сказано, що показані Jira-задачі мали `To Do`, тому виконання треба підтвердити окремо. PR3 створює тест-кейси й checklist, але не містить заповнених фактичних результатів. PR4 прямо називає баги потенційними/Not tested.
 
-Це специфікація очікувань, не результат тестування. У наявному checkout немає автоматизованих тестових файлів; цей аудит натомість виконав inline числові перевірки, описані нижче. PR3 викликає старий `process_signal(samples, fs, source_id=...)`; у поточному API треба використовувати `process_signal(AudioPacket(...))`.
+Це специфікація очікувань, не результат тестування. Під час первинного аудиту автоматизованих тестів ще не було; надалі додано suite в `test/` (актуальний прогін — у розділі від 2026-11-23 нижче). Первинний аудит виконав inline числові перевірки. PR3 викликає старий `process_signal(samples, fs, source_id=...)`; у поточному API треба використовувати `process_signal(AudioPacket(...))`.
 
 ## Обсяг
 
@@ -201,3 +201,24 @@ Live Jira MLT-14 (`Створити unit-тести`) має status `To Do`, par
 Coverage включає `audio_io` (разом з CLI) і `signal_proc`, але не `audio_contracts`. Найбільше непокритих гілок лишається у WAV reader — header/format/identity/error validation paths; точні пропуски наведені в DOCX raw listing. DSP пропуски: zero-gain window fallback, порожній frequency range і peak rejection через separation. Вони є coverage gaps, а не підтвердженими дефектами. Обидва test doubles (`butter_stub`, `Mock` для `sosfilt`) перевіряють межу фільтра у MLT-5 suite; WAV reader tests використовують тимчасові WAV файли й реальну реалізацію.
 
 Під час розширення звіту source code і тести не змінювались. Google Classroom connector не доступний у поточних інтеграціях, тому DOCX лишається готовим до ручного завантаження. Jira status не запитувався, бо для звіту достатньо перевірених repo tests і code coverage.
+
+## Окремий компактний протокол MLT-5 — 2026-11-23
+
+Код і наявні 10 тестів `test/test_signal_proc.py` не змінювалися: вони вже демонструють потрібні assert styles і два двійники (`butter_stub`, `Mock` для `sosfilt`). Окремий протокол для `signal_proc` опубліковано в `main@5e6ea9c`: `docs/unit_testing/protocol.docx`, `protocol.pdf` (6 сторінок), `protocol.txt`. Оформлення звірено з погодженими прикладами `~/kpi3/kpi4/arh/pr5` та `arh/pr6`: A4, Arial 11, інтервал 1,15, поля 2,54 см, блакитні шапки таблиць. Номер практичної та варіант не вигадані, бо їх немає в умові.
+
+Фактичні команди після активації `.venv`:
+
+```sh
+python -m coverage run --branch --source=signal_proc -m pytest -p no:cacheprovider test/test_signal_proc.py -v
+python -m coverage report -m
+python -m coverage json -o docs/unit_testing/coverage.json
+python -m coverage html -d htmlcov/signal_proc
+```
+
+Результат: **10 passed in 3.13s**; Python 3.13.7, pytest 9.2.0, Coverage.py 7.17.2, NumPy 2.5.4, SciPy 1.18.1. Покрито **152/156 операторів (97,44%)**, **53/56 переходів (94,64%)**; combined **96,70%**, у консолі округлено до 97%. Scope включає `signal_proc/__init__.py` та `processing.py`, без `audio_contracts`, `audio_io` і бібліотек. Missing: `processing.py:194–195,218–219`, partial transition `243→245`. Це прогалини вимірювання, не підтверджені дефекти.
+
+Перед окремим вимірюванням виконано повний контрольний suite з `--source=audio_io,signal_proc`: **18 passed in 4.63s**. Первинні докази — `docs/unit_testing/pytest.txt`, `pytest-full.txt`, `coverage.txt`, `coverage.json`, `environment.json` із SHA-256 test/source файлів. HTML локальний та ігнорується Git. Звіт містить повний лістинг 10 тестів; перевірено наявність усіх test-функцій у DOCX/PDF, шрифти/таблиці DOCX, PDF page count та візуально сторінки зі сценаріями, coverage і кодом.
+
+Генератор `docs/unit_testing/build_protocol.py` читає докази, перевіряє хеші source/test, не запускає тести. Залежності — `requirements-report.txt`; для PDF потрібні Arial/Courier New, каталог задається `--font-dir`. Фактична генерація використала вже наявні report-пакети з `/private/tmp/kpi4-pr5-tools`; `python -m compileall -q docs/unit_testing/build_protocol.py` та `git diff --cached --check` успішні. Попередній незакомічений двомодульний DOCX і видалення старого `tools/build_mlt5_protocol.py` збережені без змін та не включені в коміт.
+
+Classroom не завантажено: пошук доступних plugins не знайшов придатної інтеграції Google Classroom. Наступна дія — завантажити PDF або DOCX у потрібне завдання. Jira не читали й не змінювали: користувач не обирав issue/sprint для delivery.
