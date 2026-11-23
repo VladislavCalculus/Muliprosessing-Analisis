@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-23",
+  "scope": "signal_proc",
+  "test_file": "test/test_signal_proc.py",
+  "python": "3.13.7",
+  "versions": {
+    "pytest": "9.2.0",
+    "coverage": "7.17.2",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1"
+  },
+  "sha256": {
+    "test/test_signal_proc.py": "1ed6f58139a561fa954b7dda2a88945d305a73d63cdb4d85811fcf2ed3d46759",
+    "src/signal_proc/processing.py": "dc9963475f9849da422cadc2ef7bf376e5d7035edec3fe04c3412516c501d48d"
+  },
+  "commands": [
+    "python -m coverage run --branch --source=signal_proc -m pytest -p no:cacheprovider test/test_signal_proc.py -v",
+    "python -m coverage report -m",
+    "python -m coverage json -o docs/unit_testing/coverage.json"
+  ]
+}

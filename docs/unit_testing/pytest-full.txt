@@ -1,0 +1,26 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.7, pytest-9.2.0, pluggy-1.7.0 -- /Users/admin/kp4/.venv/bin/python
+rootdir: /Users/admin/kp4
+configfile: pyproject.toml
+collecting ... collected 18 items
+
+test/test_audio_io.py::test_wav_parameters[mono] PASSED                  [  5%]
+test/test_audio_io.py::test_wav_parameters[stereo] PASSED                [ 11%]
+test/test_audio_io.py::test_batch_continues_after_bad_middle_file PASSED [ 16%]
+test/test_audio_io.py::test_empty_file_returns_controlled_error PASSED   [ 22%]
+test/test_audio_io.py::test_missing_file_returns_read_failed PASSED      [ 27%]
+test/test_audio_io.py::test_decoded_wav_can_be_processed_by_mlt5 PASSED  [ 33%]
+test/test_audio_io_cli.py::test_cli_shows_metadata_and_success_status PASSED [ 38%]
+test/test_audio_io_cli.py::test_cli_reports_bad_middle_file_and_still_loads_last PASSED [ 44%]
+test/test_signal_proc.py::test_mlt_frequency_resolution_and_peak_order PASSED [ 50%]
+test/test_signal_proc.py::test_peaks_are_separate_per_channel_and_sorted_by_amplitude PASSED [ 55%]
+test/test_signal_proc.py::test_real_low_and_high_pass_filters_attenuate_stop_band_and_preserve_input PASSED [ 61%]
+test/test_signal_proc.py::test_filter_backend_uses_stub_and_mock PASSED  [ 66%]
+test/test_signal_proc.py::test_signed_and_unsigned_pcm_are_scaled_without_mutating_input PASSED [ 72%]
+test/test_signal_proc.py::test_odd_length_fft_has_correct_one_sided_amplitude PASSED [ 77%]
+test/test_signal_proc.py::test_nyquist_single_frame_and_silence_edge_cases PASSED [ 83%]
+test/test_signal_proc.py::test_peak_threshold_range_separation_and_limit PASSED [ 88%]
+test/test_signal_proc.py::test_invalid_configs_arguments_and_samples_raise_expected_errors PASSED [ 94%]
+test/test_signal_proc.py::test_payload_and_pickle_round_trip_preserve_result PASSED [100%]
+
+============================== 18 passed in 4.63s ==============================

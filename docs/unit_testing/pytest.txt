@@ -1,0 +1,18 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.7, pytest-9.2.0, pluggy-1.7.0 -- /Users/admin/kp4/.venv/bin/python
+rootdir: /Users/admin/kp4
+configfile: pyproject.toml
+collecting ... collected 10 items
+
+test/test_signal_proc.py::test_mlt_frequency_resolution_and_peak_order PASSED [ 10%]
+test/test_signal_proc.py::test_peaks_are_separate_per_channel_and_sorted_by_amplitude PASSED [ 20%]
+test/test_signal_proc.py::test_real_low_and_high_pass_filters_attenuate_stop_band_and_preserve_input PASSED [ 30%]
+test/test_signal_proc.py::test_filter_backend_uses_stub_and_mock PASSED  [ 40%]
+test/test_signal_proc.py::test_signed_and_unsigned_pcm_are_scaled_without_mutating_input PASSED [ 50%]
+test/test_signal_proc.py::test_odd_length_fft_has_correct_one_sided_amplitude PASSED [ 60%]
+test/test_signal_proc.py::test_nyquist_single_frame_and_silence_edge_cases PASSED [ 70%]
+test/test_signal_proc.py::test_peak_threshold_range_separation_and_limit PASSED [ 80%]
+test/test_signal_proc.py::test_invalid_configs_arguments_and_samples_raise_expected_errors PASSED [ 90%]
+test/test_signal_proc.py::test_payload_and_pickle_round_trip_preserve_result PASSED [100%]
+
+============================== 10 passed in 3.13s ==============================
