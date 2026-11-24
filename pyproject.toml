@@ -15,6 +15,9 @@ test = ["pytest>=8.3,<10", "coverage>=7.9,<8"]
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+result_store = ["*.sql"]
+
 [tool.pytest.ini_options]
 testpaths = ["test"]
 addopts = "-ra"

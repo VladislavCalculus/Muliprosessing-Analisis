@@ -119,7 +119,7 @@ def code_lines(text):
     )
 
 
-def build_docx(blocks):
+def build_docx(blocks, title="Модульне тестування signal_proc (MLT-5)"):
     from docx import Document
     from docx.shared import Cm, Pt, RGBColor
     from docx.oxml import OxmlElement
@@ -176,12 +176,12 @@ def build_docx(blocks):
                 run.font.name, run.font.size = "Courier New", Pt(8.5 if line else 4)
         else:
             doc.add_paragraph(value, {"title": "Title", "h": "Heading 1"}.get(kind))
-    doc.core_properties.title = "Модульне тестування signal_proc (MLT-5)"
+    doc.core_properties.title = title
     doc.core_properties.author = ""
     doc.save(HERE / "protocol.docx")
 
 
-def build_pdf(blocks, font_dir):
+def build_pdf(blocks, font_dir, title="Модульне тестування signal_proc (MLT-5)"):
     from reportlab.pdfbase import pdfmetrics
     from reportlab.pdfbase.ttfonts import TTFont
     from reportlab.lib import colors
@@ -238,7 +238,7 @@ def build_pdf(blocks, font_dir):
     SimpleDocTemplate(str(HERE / "protocol.pdf"), pagesize=A4,
                       leftMargin=2.54*cm, rightMargin=2.54*cm,
                       topMargin=2.54*cm, bottomMargin=2.54*cm,
-                      title="Модульне тестування signal_proc (MLT-5)", author="").build(story)
+                      title=title, author="").build(story)
 
 
 if __name__ == "__main__":

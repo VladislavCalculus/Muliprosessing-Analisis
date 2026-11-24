@@ -1,0 +1,6 @@
+Wheel built successfully. Required package resources present:
+result_store/schema.sql
+result_store/seed.sql
+batch_proc/pool.py
+batch_proc/__main__.py
+Imported result_store directly from built wheel; SQL resources initialized a fresh SQLite database; empty run finished as completed.

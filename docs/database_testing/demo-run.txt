@@ -1,0 +1,7 @@
+exit_code=1
+{"event": "run_started", "run_id": "7729ce6436d44a34bbe257b515ca9227", "total": 4}
+{"event": "file_completed", "source_id": "file-2", "result_id": 1, "status": "failed", "error_code": "invalid_wav"}
+{"event": "file_completed", "source_id": "file-1", "result_id": 2, "status": "succeeded", "error_code": null}
+{"event": "file_completed", "source_id": "file-3", "result_id": 3, "status": "succeeded", "error_code": null}
+{"event": "file_completed", "source_id": "file-4", "result_id": 4, "status": "failed", "error_code": "empty_audio"}
+{"event": "run_finished", "run_id": "7729ce6436d44a34bbe257b515ca9227", "created_at": "2026-11-24T12:44:17.980Z", "finished_at": "2026-11-24T12:44:19.450Z", "status": "completed", "expected_count": 4, "worker_count": 2, "parent_pid": 5801, "filter_json": "{\"cutoff_hz\":600.0,\"kind\":\"lowpass\",\"order\":4}", "peak_json": "{\"max_peaks\":5,\"min_amplitude_ratio\":0.05,\"min_frequency_hz\":0.0,\"min_separation_hz\":0.0}", "error_message": null, "completed_count": 4, "success_count": 2, "failure_count": 2, "duration_seconds": 1.47}

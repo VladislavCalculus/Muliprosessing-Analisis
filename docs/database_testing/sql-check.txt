@@ -1,0 +1,12 @@
+$ sqlite3 <fresh-db> < src/result_store/schema.sql
+
+$ sqlite3 <fresh-db> < src/result_store/seed.sql
+
+Run summary
+[{"run_id":"seed-run","status":"completed","expected_count":2,"completed_count":2,"success_count":1,"failure_count":1,"duration_seconds":1.0}]
+
+Two master-detail joins
+[{"run_id":"seed-run","source_id":"tone","channel_index":0,"frequency_hz":440.0,"amplitude":0.8000000000000000444},
+{"run_id":"seed-run","source_id":"tone","channel_index":1,"frequency_hz":1000.0,"amplitude":0.2999999999999999889}]
+
+PRAGMA foreign_key_check: no violations (empty output)

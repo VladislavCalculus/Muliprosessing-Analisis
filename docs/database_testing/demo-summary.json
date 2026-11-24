@@ -1,0 +1,23 @@
+{
+  "run_id": "7729ce6436d44a34bbe257b515ca9227",
+  "status": "completed",
+  "success_count": 2,
+  "failure_count": 2,
+  "history_cli_exit": 0,
+  "roundtrip": [
+    {
+      "source_id": "file-1",
+      "filtered_samples_equal": true,
+      "frequencies_equal": true,
+      "amplitudes_equal": true,
+      "peaks_equal": true
+    },
+    {
+      "source_id": "file-3",
+      "filtered_samples_equal": true,
+      "frequencies_equal": true,
+      "amplitudes_equal": true,
+      "peaks_equal": true
+    }
+  ]
+}

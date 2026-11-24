@@ -1,0 +1,22 @@
+{
+  "date": "2026-11-24",
+  "python": "3.13.7",
+  "sqlite": "3.43.2",
+  "pytest": "9.2.0",
+  "platform": "Darwin",
+  "test_file": "test/test_result_store.py",
+  "sql_files": [
+    "src/result_store/schema.sql",
+    "src/result_store/seed.sql"
+  ],
+  "sha256": {
+    "src/result_store/__init__.py": "837d6ee4a3dc8360fe53f5040a1d96a5734af1ba8655344571dbc0dbf9f2a4db",
+    "src/result_store/schema.sql": "d98a4e520507fc3371f722f9d1e7cb572c523258715255414dee116aa030797d",
+    "src/result_store/seed.sql": "270a443bc0fae4bbbefeead2d844c4df7f723c1d56cfff7574bfb7b2d2221310",
+    "src/result_store/store.py": "7a06e572570b89688f6e4c947e2f970b78c705310f35095ee6384ba31c0bbbd2",
+    "test/test_result_store.py": "d41486daa0057738581a1510810ddf147b1367562d38926481d64fb392539ef2"
+  },
+  "commands": [
+    "PYTHONPATH=src .venv/bin/python -m pytest -p no:cacheprovider test/test_result_store.py -v"
+  ]
+}

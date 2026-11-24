@@ -1,0 +1,10 @@
+{
+  "date": "2026-11-24",
+  "sample_rate_hz": 8000,
+  "frames": 8000,
+  "channels": 1,
+  "job_pickle_bytes": 192,
+  "result_pickle_bytes": 129039,
+  "peak_hz": 440.0,
+  "scope": "Serialization size only; not a throughput or speedup benchmark"
+}

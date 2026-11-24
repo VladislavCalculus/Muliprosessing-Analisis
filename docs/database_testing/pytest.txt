@@ -1,0 +1,17 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.7, pytest-9.2.0, pluggy-1.7.0 -- /Users/admin/kp4/.venv/bin/python
+rootdir: /Users/admin/kp4
+configfile: pyproject.toml
+collecting ... collected 9 items
+
+test/test_result_store.py::test_schema_seed_two_master_detail_links_and_sql_functions PASSED [ 11%]
+test/test_result_store.py::test_fields_unique_identity_and_error_metadata_are_enforced PASSED [ 22%]
+test/test_result_store.py::test_foreign_keys_and_two_level_cascade PASSED [ 33%]
+test/test_result_store.py::test_triggers_validate_peaks_and_freeze_saved_results PASSED [ 44%]
+test/test_result_store.py::test_run_finishes_only_after_all_results_and_rejects_late_writes PASSED [ 55%]
+test/test_result_store.py::test_failed_peak_insert_rolls_back_parent_and_removes_artifact PASSED [ 66%]
+test/test_result_store.py::test_reopen_restores_full_arrays_configs_identity_and_peaks PASSED [ 77%]
+test/test_result_store.py::test_same_source_in_another_run_and_failed_run_history PASSED [ 88%]
+test/test_result_store.py::test_every_connection_enforces_foreign_keys_and_unknown_schema_is_rejected PASSED [100%]
+
+============================== 9 passed in 1.51s ===============================

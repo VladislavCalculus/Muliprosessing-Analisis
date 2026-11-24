@@ -1,0 +1,120 @@
+{
+  "run": {
+    "run_id": "7729ce6436d44a34bbe257b515ca9227",
+    "created_at": "2026-11-24T12:44:17.980Z",
+    "finished_at": "2026-11-24T12:44:19.450Z",
+    "status": "completed",
+    "expected_count": 4,
+    "worker_count": 2,
+    "parent_pid": 5801,
+    "filter_json": "{\"cutoff_hz\":600.0,\"kind\":\"lowpass\",\"order\":4}",
+    "peak_json": "{\"max_peaks\":5,\"min_amplitude_ratio\":0.05,\"min_frequency_hz\":0.0,\"min_separation_hz\":0.0}",
+    "error_message": null,
+    "completed_count": 4,
+    "success_count": 2,
+    "failure_count": 2,
+    "duration_seconds": 1.47
+  },
+  "files": [
+    {
+      "result_id": 1,
+      "run_id": "7729ce6436d44a34bbe257b515ca9227",
+      "source_id": "file-2",
+      "source_path": "/private/var/folders/s6/y1b6rqyd35l_4ngkz10779sw0000gn/T/kp4-mlt2-demo-20261124-dfdq9y_h/broken.wav",
+      "job_name": null,
+      "source_name": "broken.wav",
+      "status": "failed",
+      "worker_pid": 5804,
+      "elapsed_seconds": 0.0005674590065609664,
+      "sample_rate_hz": null,
+      "frame_count": null,
+      "channel_count": null,
+      "artifact_name": null,
+      "error_stage": "read",
+      "error_code": "invalid_wav",
+      "error_message": "Файл не містить правильного заголовка WAV.",
+      "duration_seconds": null,
+      "peaks": []
+    },
+    {
+      "result_id": 2,
+      "run_id": "7729ce6436d44a34bbe257b515ca9227",
+      "source_id": "file-1",
+      "source_path": "/private/var/folders/s6/y1b6rqyd35l_4ngkz10779sw0000gn/T/kp4-mlt2-demo-20261124-dfdq9y_h/mono.wav",
+      "job_name": null,
+      "source_name": "mono.wav",
+      "status": "succeeded",
+      "worker_pid": 5803,
+      "elapsed_seconds": 0.0034422629978507757,
+      "sample_rate_hz": 8000,
+      "frame_count": 8000,
+      "channel_count": 1,
+      "artifact_name": "7c4c165b957c4dcda81ba9257d0d2fbf.npz",
+      "error_stage": null,
+      "error_code": null,
+      "error_message": null,
+      "duration_seconds": 1.0,
+      "peaks": [
+        {
+          "channel_index": 0,
+          "peak_index": 0,
+          "frequency_hz": 440.0,
+          "amplitude": 0.4815584131515273
+        }
+      ]
+    },
+    {
+      "result_id": 3,
+      "run_id": "7729ce6436d44a34bbe257b515ca9227",
+      "source_id": "file-3",
+      "source_path": "/private/var/folders/s6/y1b6rqyd35l_4ngkz10779sw0000gn/T/kp4-mlt2-demo-20261124-dfdq9y_h/stereo.wav",
+      "job_name": null,
+      "source_name": "stereo.wav",
+      "status": "succeeded",
+      "worker_pid": 5804,
+      "elapsed_seconds": 0.004349433991592377,
+      "sample_rate_hz": 16000,
+      "frame_count": 16000,
+      "channel_count": 2,
+      "artifact_name": "3591f6b2c27043b380b45085b15f09d8.npz",
+      "error_stage": null,
+      "error_code": null,
+      "error_message": null,
+      "duration_seconds": 1.0,
+      "peaks": [
+        {
+          "channel_index": 0,
+          "peak_index": 0,
+          "frequency_hz": 200.0,
+          "amplitude": 0.5999378906310167
+        },
+        {
+          "channel_index": 1,
+          "peak_index": 0,
+          "frequency_hz": 1000.0,
+          "amplitude": 0.037313652073961694
+        }
+      ]
+    },
+    {
+      "result_id": 4,
+      "run_id": "7729ce6436d44a34bbe257b515ca9227",
+      "source_id": "file-4",
+      "source_path": "/private/var/folders/s6/y1b6rqyd35l_4ngkz10779sw0000gn/T/kp4-mlt2-demo-20261124-dfdq9y_h/empty.wav",
+      "job_name": null,
+      "source_name": "empty.wav",
+      "status": "failed",
+      "worker_pid": 5803,
+      "elapsed_seconds": 0.00016550501459278166,
+      "sample_rate_hz": null,
+      "frame_count": null,
+      "channel_count": null,
+      "artifact_name": null,
+      "error_stage": "read",
+      "error_code": "empty_audio",
+      "error_message": "Файл порожній: у ньому немає аудіоданих.",
+      "duration_seconds": null,
+      "peaks": []
+    }
+  ]
+}
