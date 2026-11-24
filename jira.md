@@ -20,6 +20,21 @@
 
 ## Джерело та дата перевірки
 
+### Завершення MLT-2 — live workflow 2026-11-24
+
+Пряме доручення почати погоджений план охопило MLT-2 і MLT-21/22/19/20/29; MLT-1/3 не змінювалися. Project-scoped REST повторно перевірив identity MLT, descriptions/AC та відсутні comments/links. Послідовність фактичних стартів і незалежних review: 21 → 22 → 19 → 20 → 29; кожна child окремо пройшла To Do → In Progress → Done. Після фінального integration review/publication завершено parent epic.
+
+| Issue | Фінальний status | Resolution | Доказ |
+| --- | --- | --- | --- |
+| MLT-21 | Done | Done (10000) | Descriptor/worker boundary, незалежний full22 PASS |
+| MLT-22 | Done | Done (10000) | Reusable spawn pool і cleanup, незалежний lifecycle3 PASS |
+| MLT-19 | Done | Done (10000) | Bounded parallel scheduling/correlation, незалежний schedule3 PASS |
+| MLT-20 | Done | Done (10000) | Full outcomes у parent, незалежний collection3 PASS |
+| MLT-29 | Done | Done (10000) | Реальний abnormal exit/peer survival/replacement, незалежний crash3 PASS |
+| MLT-2 | Done | Done (10000) | Усі children reread Done/Done; фінальний review, 45/45, CLI/storage/protocol/wheel, main@cb32243 |
+
+Кожний transition використовував свіжі доступні metadata (In Progress id21, Done id31), HTTP204 і повторне читання status/Resolution. Resolution Done встановила Jira workflow, ручних field updates не було. Evidence comments перечитані після запису; parent comment10005 містить посилання на опублікований commit. Не виконувалися assignee/priority/sprint changes, нові issues або Bug creation: підтверджених позаскопових дефектів не було. Runtime/тестові докази — `testing.md`, schema/API — `system.md`/`data_contract.md`. SQLite є user-authorized extension, не переписаний Jira AC.
+
 ### Вибіркова live звірка доречності БД — 2026-11-23
 
 Read-only REST fallback повторно підтвердив `/rest/api/3/project/MLT`. Отримано descriptions/status/parent/links для епіків MLT-1/2/3 і всіх 13 children через `project = MLT AND parent in (MLT-1, MLT-2, MLT-3) ORDER BY key`; Jira writes не виконувалися. Docker runtime недоступний, читання через REST успішне.

@@ -91,4 +91,41 @@ MLT-4 читає WAV, MLT-5 обробляє декодовані відліки
 
 ## Наявна реалізація проти майбутнього
 
-`AudioPacket`, `AudioReadError`, `AudioReadResult`, WAV parser і прийом пакета в MLT-5 реалізовані у `main`. Worker job descriptor, process pool, окремий DSP error envelope та UI-агрегація не реалізовані. Loopback HTTP pipeline, що тимчасово був у `db974ab`, скасований; він не є чинним контрактом.
+`AudioPacket`, `AudioReadError`, `AudioReadResult`, WAV parser і прийом пакета в MLT-5 реалізовані. У реалізації від 2026-11-24 додано наведені нижче descriptor, per-file outcome та process pool. Web UI/MLT-3 лишається майбутнім модулем. Loopback HTTP pipeline, що тимчасово був у `db974ab`, скасований; він не є чинним контрактом.
+
+## MLT-2: завдання та результат — 2026-11-24
+
+Підтверджено `src/audio_contracts/jobs.py`, `src/batch_proc/{worker,pool,schedule,batch}.py` та незалежними перевірками кожного Jira milestone. Це доповнення без зміни `AudioPacket`/`SignalPacket` v1.
+
+| Тип | Поля та правила |
+| --- | --- |
+| `audio_contracts.FileJob` | Frozen/slotted dataclass: непорожній `source_id`, `path` (text path-like, нормалізований до абсолютного `Path`), `source_name: str\|None`, `schema_version=1`. Немає ndarray; шлях може ще не існувати — це read error worker-а. |
+| `audio_contracts.JobError` | Frozen/slotted: `source_id`, непорожні `error_code`/`message`, `stage` = `read`/`process`/`worker`, optional `source_name`, `schema_version=1`. Exception/traceback не передаються. |
+| `batch_proc.JobResult` | `job: FileJob`, рівно одне з `packet: SignalPacket\|None` / `error: JobError\|None`, додатний integer `worker_pid`, finite nonnegative `elapsed_seconds`. `source_id` payload має збігатися з job. Окремого поля schema version у wrapper немає. Властивості `source_id`, `succeeded`. |
+| `batch_proc.BatchResult` | `results_by_source: dict[str,JobResult]`, узгоджений `total_count`, `parent_pid`, `elapsed_seconds`; похідні `success_count`, `failure_count`, `worker_pids`. Wrapper frozen, dict/NumPy arrays shallow mutable; не змінювати під час передавання споживачам. |
+
+`process_file(job, *, filter_config=None, peak_config=None)` читає WAV та виконує DSP в одному поточному процесі. Caller type errors відхиляються до читання. Звичайна read failure зберігає код reader-а; звичайний DSP exception стає `processing_failed` зі stage `process`.
+
+`iter_batch(jobs, *, worker_count=2, filter_config=None, peak_config=None)` перевіряє скінченний набір легких descriptor-ів і унікальність ID до spawn. Пул має не більше `min(worker_count, job_count)` reusable spawn-процесів. Parent тримає pending deque, кожен worker має приватний duplex Pipe та не більше одного assigned job. Вхідний `AudioPacket` через IPC не йде; вихідний `JobResult` серіалізує повні масиви стандартним pickle.
+
+Ітератор повертає результати за завершенням, не за вхідним порядком. Споживати через `source_id`, при достроковому виході закрити ітератор (`contextlib.closing`). `run_batch(..., on_result=None)` — явний opt-in збір усіх packet-ів у RAM; callback працює синхронно в parent. Його помилка видима викликачеві після очищення пулу.
+
+Аварія assigned worker дає один `worker_exited` outcome зі stage `worker`. Аварійний файл не повторюється автоматично; лише загиблий slot замінюється за потреби наступних задач, surviving worker продовжує роботу. При загибелі idle процесу незапущений descriptor зберігається. Загальна кількість replacements обмежена, інфраструктурна неможливість продовження піднімає явний exception. Це не watchdog для живого, але завислого обчислення.
+
+Фактичний розмір pickle для 1 s mono/8000 Hz/8000 frames/440 Hz: `FileJob` **192 bytes**, `JobResult` **129039 bytes**, пік 440 Hz. Доказ — `docs/database_testing/ipc-size.json`. Це вимір розміру одного payload, не throughput/speedup benchmark і не доказ відсутності bottleneck для великих WAV.
+
+## SQLite history schema 1 — 2026-11-24
+
+Точний DDL — `src/result_store/schema.sql`, standalone SQL fixture — `seed.sql`; файли включені до distribution. Кожне connection має FK=ON. `STRICT` таблиці потребують SQLite >=3.37, JSON configs перевіряються `json_valid`.
+
+| Таблиця | Контракт та інваріанти |
+| --- | --- |
+| `analysis_run` | Текстовий непорожній run_id (API генерує UUID hex), UTC created/finished timestamps, `status=running/completed/failed`, nonnegative integer expected_count, positive worker_count/parent_pid, nullable filter_json і required peak_json. Параметри після створення не змінюються; finish тільки один раз. Completed потребує рівно expected_count outcomes і може містити файлові помилки. Failed означає інфраструктурне переривання з error_message та можливими частковими результатами. |
+| `file_result` | Integer result_id, FK run_id ON DELETE CASCADE, source_id/path/name, status succeeded/failed, worker_pid та finite elapsed_seconds. UNIQUE(run_id,source_id). Success має positive sample_rate_hz/frame_count/channel_count і managed artifact_name, без error fields. Failure має stage/code/message, без sample metadata/NPZ; метадані невдалого читання не вигадуються. UPDATE заборонено trigger-ом. |
+| `spectral_peak` | Integer peak_id, FK result_id ON DELETE CASCADE, nonnegative channel_index/peak_index, positive finite frequency_hz/amplitude, UNIQUE(result_id,channel_index,peak_index). Trigger допускає лише successful parent, канал < channel_count, frequency <= sample_rate_hz/2 та running run. Амплітуда може перевищувати 1, бо float audio не нормалізується за peak. UPDATE заборонено. |
+
+`run_summary` — SQL view: completed/success/failure counts та wall-clock duration_seconds через count/sum/coalesce/julianday/round. Запис після завершення запуску/понад expected_count відхиляється. Це два FK master–detail зв'язки; повторне використання source_id в іншому run дозволене.
+
+`save_result` приймає підтримуваний SignalPacket schema1 з конфігураціями, що збігаються з run. Один result і всі його peaks записуються атомарно; scalar bounds перевіряє SQL, числові ndarray також перевіряються на finite перед NPZ. `load_result` повертає повний JobResult з source identity/configs/масивами/піками; JSON-safe list/get API містить metadata й peaks, а не великі ndarray. Артефакти, seed-обмеження та crash consistency — у `system.md`/`docs/MLT2.md`.
+
+Seed — лише SQL metadata fixture: 1 run, 2 file outcomes (success/error), 2 peaks. `seed-tone.npz` — явно ілюстративне посилання; фізичного NPZ seed не створює й числовий load цього запису не обіцяється. Реальний round-trip перевірено через ResultStore/CLI.

@@ -1,5 +1,12 @@
 # Дайджест змін
 
+## 2026-11-24 — MLT-2, SQLite history та протокол завершені й опубліковані
+
+- `main@cb32243` опубліковано в `origin/main`, hashes збігаються. Реалізовані FileJob/JobError, local reader→DSP worker, reusable supervised spawn pool, bounded completion-order scheduling, parent aggregation, abrupt-exit isolation/replacement, окреме SQLite/NPZ history й run/history CLI. Чинні reader/DSP API та початкові 10 DSP tests не змінені. Першоджерела поведінки — `system.md`/`data_contract.md`.
+- DB9 tests пройшли за1.51s, full45 за24.20s; незалежні milestone/final review PASS, реально відтворені worker crash і storage failure. Native SQL/seed/FK, повний filtered batch із2success/2errors та serial-equal restored arrays, wheel/cold-import, compileall/diff успішні. SQL/test listings і перевірені DOCX/PDF/TXT (9 PDF сторінок) у `docs/database_testing/`; докази — `testing.md`.
+- Через вузький workflow окремо закрито MLT-21/22/19/20/29, потім MLT-2; final reread для всіх — Done/Resolution Done. MLT-1/3 не змінені, нові issues не створювалися. Джерело — `jira.md`/`backlog.md`.
+- Уточнено виконання плану, D-13 і status; web UI лишається останнім. SQLite stored procedures не підтримуються/не заявляються; documented limits не приховані. Попередні локальні user edits збережені.
+
 ## 2026-11-23 — план MLT-2 зі сховищем і порівняння SQLite/server
 
 - Додано `mlt2_storage_plan.md`, посилання в `README.md`, `architecture.md`, `status.md`: п'ять етапів, результати кожного, схема run→file_result→peak, централізований writer та критерії перевірок. Це лише запитаний план, без реалізації/Jira writes/запуску тестів.

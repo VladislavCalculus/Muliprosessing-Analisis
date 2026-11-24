@@ -1,14 +1,16 @@
-# Фактичний стан MLT-4/MLT-5 у main
+# Фактичний стан аудіоаналізу у main
 
-Це опис поточного коду `main@f73be7c`, не всієї задуманої системи. MLT-4 WAV reader і MLT-5 DSP інтегровані; окремий HTTP pipeline commit був скасований, MLT-2 worker pool та MLT-3 UI не реалізовані. Джерела: [`../README.md`](../README.md), [`../src/audio_io/reader.py`](../src/audio_io/reader.py), [`../src/signal_proc/processing.py`](../src/signal_proc/processing.py), [`../src/audio_contracts/packets.py`](../src/audio_contracts/packets.py), [`../pyproject.toml`](../pyproject.toml).
+Це опис `main@cb32243` від 2026-11-24, не всієї задуманої системи. Реалізовані MLT-4 WAV reader, MLT-5 DSP, MLT-2 supervised worker pool і окреме SQLite-сховище історії. MLT-3 буде вебінтерфейсом і ще не реалізований. HTTP pipeline з `db974ab` залишається скасованим. Джерела: README, `src/`, pyproject та `docs/MLT2.md`; фактичні перевірки — у `testing.md`.
 
 ## Пакети Python
 
-- `audio_contracts` (`src/audio_contracts/`) експортує `AudioPacket`, `AudioReadError`, `AudioReadResult`.
+- `audio_contracts` (`src/audio_contracts/`) експортує `AudioPacket`, `AudioReadError`, `AudioReadResult`, `FileJob`, `JobError`.
 - `audio_io` (`src/audio_io/`) експортує `WavSource`, `WavFile`, `read_wav`, `read_wav_details`, `read_wav_batch` для MLT-4.
 - `signal_proc` (`src/signal_proc/`) експортує `FilterConfig`, `PeakConfig`, `SignalPacket`, `SignalSpectrum`, `SpectralPeak`, `process_signal`.
 - Distribution у PyPI metadata зветься `mlt-signal-processing`; це не назва Python import package.
-- Автоматичне setuptools discovery знаходить `audio_contracts`, `audio_io` та `signal_proc`.
+- `batch_proc` (`src/batch_proc/`) виконує per-file worker, supervised spawn pool, incremental scheduling і parent aggregation; має CLI `run`/`history`.
+- `result_store` (`src/result_store/`) надає `ResultStore` та SQL schema/seed ресурси; вони включені до wheel через package-data.
+- Автоматичне setuptools discovery знаходить усі п'ять пакетів.
 
 ## `AudioPacket` — decoded input
 
@@ -97,5 +99,17 @@ Batch API зберігає input order і продовжується після 
 ## Межі та відомі обмеження
 
 - MLT-5 не читає WAV, не показує графіки, не запускає worker pool, не пише аудіофайли.
-- `main` має MLT-4/5, але не має MLT-2 worker pool чи MLT-3 UI. HTTP pipeline, який тимчасово додавався, скасований. Див. `architecture.md` і `status.md`.
+- `main` має MLT-2/4/5 та SQLite history, але не має MLT-3 web UI. HTTP pipeline, який тимчасово додавався, скасований. Див. `architecture.md` і `status.md`.
 - Schema v1 і API описують наявний пакетний контракт. Будь-які модифікації мають бути узгоджені в `data_contract.md` і у всіх споживачів.
+
+## MLT-2 та історія — 2026-11-24
+
+`batch_proc` використовує explicit `spawn`, приватний duplex Pipe на worker і максимум один assigned descriptor на процес. Reader та DSP працюють локально у worker, parent отримує `JobResult`. `iter_batch` поступово повертає outcomes, `run_batch` явно накопичує їх у `BatchResult`; API/інваріанти — в `data_contract.md`. Падіння одного worker повертає один `worker_exited`, файл автоматично не повторюється, лише загиблий slot замінюється за потреби pending задач. Ізоляція реального `os._exit(23)`, idle death і cleanup перевірена незалежно. Живий, але завислий worker без watchdog timeout не покривається цією поведінкою.
+
+`ResultStore(path, *, artifact_dir=None)` потребує SQLite >=3.37 із JSON-функціями; кожне connection вмикає й перевіряє FK, зберігає owner PID. Schema user_version=1; непідтримувана версія або чужа непорожня unversioned БД відхиляються. Нормальна ініціалізація не завантажує seed.
+
+API: `create_run(expected_count, worker_count, filter_config, peak_config)`, `save_result(run_id, JobResult)`, `finish_run(run_id, error_message=None)`, `get_run`, `list_runs`, `list_results`, `load_result(result_id)`. Tables — `analysis_run → file_result → spectral_peak`; типи/статуси описані в `data_contract.md`, точний DDL — `src/result_store/schema.sql`.
+
+Успішні результати зберігають повні масиви та spectrum metadata у managed NPZ, без pickle; filter/peak configs і peaks — у SQL. Імена NPZ генеруються випадково, load перевіряє containment у artifact directory. Source WAV для повторного читання історії не потрібний. Збереження result+peaks — одна `BEGIN IMMEDIATE` транзакція, при SQL failure новий NPZ прибирається. SQLite й файлова система не є спільною транзакцією: загибель parent між NPZ та commit може лишити orphan; direct SQL cascade не видаляє зовнішні NPZ, maintenance API відсутній. Для backup/перенесення потрібні БД та sibling `<database-filename>.artifacts/` після завершення запису.
+
+CLI: `python -m batch_proc run --db history.sqlite3 --workers 2 a.wav bad.wav b.wav`; `history --db ... [--run-id ID]`. Run streaming, DB writer тільки parent; exit0 усі успіхи, exit1 файлові помилки після всього batch, exit2 arguments/infrastructure/storage, exit130 interrupt. Storage failure видима й за можливості позначає run failed. Demo: `python examples/batch_demo.py`. Native SQL stored procedures у SQLite відсутні й не заявляються.

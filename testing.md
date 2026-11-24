@@ -1,5 +1,37 @@
 # Тест-план, кейси й баг-репорти
 
+## Фактична реалізація MLT-2 і SQLite — 2026-11-24
+
+`main@cb32243` опубліковано, remote hash збігається. Початкові 18 reader/DSP checks збережено, включно з незміненими 10 DSP tests (SHA-256 як у попередньому environment.json). Додано 16 process-level checks (worker4, pool3, scheduling3, aggregation3, crash3), 9 real SQLite checks і 2 CLI subprocess checks: всього **45**.
+
+Фінальні команди й фактичні результати:
+
+```sh
+.venv/bin/python docs/database_testing/run_evidence.py --date 2026-11-24 --full
+# DB: 9 passed in 1.51s; повна регресія: 45 passed in 24.20s
+.venv/bin/python -m compileall -q src test docs/database_testing docs/unit_testing/build_protocol.py
+# exit 0
+.venv/bin/python -m pip install --no-build-isolation --no-deps --no-cache-dir -e .
+.venv/bin/python -m pip wheel --no-build-isolation --no-deps --no-cache-dir . -w /private/tmp/kp4-mlt2-wheel-20261124
+# editable install і wheel успішні; SQL resources присутні й cold import зі wheel ініціалізував нову БД
+PYTHONPATH=/private/tmp/kpi4-pr5-tools .venv/bin/python docs/database_testing/build_protocol.py
+# TXT/DOCX/PDF успішно; 9 PDF сторінок, усі 9 функцій і 3 SQL tables наявні
+git diff --cached --check
+# exit 0
+```
+
+Python3.13.7, pytest9.2.0, SQLite3.43.2, NumPy2.5.4, SciPy1.18.1; середовище macOS. Windows/Linux runtime не перевірявся. Первинні докази: `docs/database_testing/{pytest.txt,pytest-full.txt,environment.json,sql-check.txt,package-check.txt,demo-run.txt,demo-history.json,demo-summary.json,ipc-size.json}`. Environment містить SHA-256 усіх storage py/sql і фінального DB test file.
+
+DB9 cases: standalone schema/seed + два FK JOIN/view/native SQL functions; fields/unique/error metadata; FK/two-level cascade; peak guards і immutable updates; finish lifecycle/late writes; rollback після успішного першого peak та помилки наступного з NPZ cleanup; reopen після видалення WAV із точними масивами/config/peaks; same source у різних runs/failed history; кожне connection FK ON/невідома версія схеми не переписується.
+
+Незалежний reviewer послідовно дав PASS кожному MLT-21/22/19/20/29 milestone. Для abnormal exit фактично виконано `os._exit(23)` після старту peer: один worker_exited, той самий surviving PID завершує job, pending jobs виконує replacement. Також перевірено idle death до submit та достроковий close після crash. Власні повтори reviewer: MLT21 full22/2.30s, lifecycle3/6.12s, scheduling3/4.72s, collection3/4.26s, crashes3/8.81s.
+
+Фінальний independent SQLite+CLI review — PASS, **11 passed in9.84s**, strengthened rollback/reopen **2 passed in1.39s**. Додатковий реальний збій: regular file на місці artifact directory → CLI exit2, run failed, completed_count0, FileExistsError видима. Відкритих підтверджених дефектів немає; повну атомарність FS+SQLite та living-hang watchdog не заявляли.
+
+Root manual smoke: filtered batch mono/broken/stereo/zero-byte, 4 outcomes → 2 succeeded/2 failed (invalid_wav,empty_audio), CLI run exit1 після всіх файлів; history CLI exit0. Після reopen load_result повні filtered samples/frequencies/amplitudes та peaks для двох success побітово/точно збіглися з serial process_file reference. Це не speedup benchmark. Native sqlite3 schema+seed → completed_count2,success1,failure1,duration1s; foreign_key_check порожній.
+
+Протокол `docs/database_testing/protocol.docx/.pdf/.txt` включає повні SQL і всі 9 tests. DOCX/PDF structure перевірена, PDF сторінки переглянуті візуально. SQL stored procedures у SQLite відсутні й не заявляються; acceptance викладача щодо обов'язковості окремої процедури невідомий. Нативне SQL line/branch coverage не вимірювалось, 100% SQL coverage не заявляти. Старі coverage MLT-5 та combined MLT4/5 — датовані окремі вимірювання нижче.
+
 ## Статус доказів
 
 Джерело тест-плану — TP-MLT-2026-001 v1.1 від 04.10.2026 (звіт PR2). Він описує заплановані перевірки; у звіті сказано, що показані Jira-задачі мали `To Do`, тому виконання треба підтвердити окремо. PR3 створює тест-кейси й checklist, але не містить заповнених фактичних результатів. PR4 прямо називає баги потенційними/Not tested.

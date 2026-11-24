@@ -1,8 +1,17 @@
 # Поточний стан
 
-Остання звірка: 2026-11-23, `main@5e6ea9c` / `origin/main@5e6ea9c`; remote hash перевірено після успішного push. Актуальніше локальне дерево завжди перевіряй перед дією.
+Остання звірка: 2026-11-24, `main@cb32243` / `origin/main@cb32243`; remote hash перевірено після успішного push. Актуальніше локальне дерево завжди перевіряй перед дією.
 
-## Останній аналіз: чи потрібна системі БД
+## Завершено MLT-2 та SQLite — 2026-11-24
+
+- Користувач доручив п'ятиетапний план MLT-2/SQLite/CLI/tests/protocol, скасувавши призупинення. У `main@cb32243` є `batch_proc`, `result_store`, shared FileJob/JobError; старі reader/DSP API й 10 DSP tests збережені. Web UI/MLT-3 лишається останнім і ще не реалізований.
+- Фінальні перевірки: **DB9 passed in1.51s, full45 passed in24.20s**; compileall/diff, native SQL schema/seed/FK, editable/wheel/cold-import і реальний 4-file filtered batch успішні. Незалежний review кожного milestone та фінального storage/CLI — PASS. Докази/точні команди — `testing.md`, `docs/database_testing/`.
+- Протокол `docs/database_testing/protocol.docx/.pdf/.txt` включає повний DDL/seed і всі 9 DB tests; PDF9 сторінок, структура/лістинги/верстка перевірені. SQLite SQL stored procedures не заявлені; чи потрібна окрема процедура для оцінки викладачем — невідомо.
+- Jira reread: **MLT-2/21/22/19/20/29 — Done, Resolution Done**, кожна child перевірена й закрита окремо; epic після фінального review/publication. MLT-1/3 не змінювалися, нових issues/підтверджених Bugs не було. Деталі — `jira.md`.
+- Межі: MLT-3 web/API ще немає; немає speedup benchmark MLT-12, watchdog живого завислого worker, auto-recovery running run після parent crash чи maintenance orphan artifacts. Backup потребує SQLite та sibling artifacts після завершення запису. Наступна погоджувана робота — наступний окремо вибраний модуль; автоматично не починати UI/MLT-1.
+- Початкові локальні видалення `tools/build_mlt5_protocol.py` та untracked `docs/MLT4_MLT5_unit_test_protocol.docx` збережені, у main commit не включені. Дані розділів нижче — історичні snapshots до цієї реалізації; актуальний стан вище.
+
+## Історичний аналіз до реалізації: 2026-11-23
 
 - За новим запитом підготовлено [`mlt2_storage_plan.md`](mlt2_storage_plan.md): п'ять етапів від single-file worker до pool, окремого сховища, інтеграції та DB перевірок/протоколу. Рекомендовано SQLite для першої версії з одним backend/writer; СУБД ще не затверджена. Відкрите питання: якщо ПЗ вимагає саме stored procedure, потрібна MySQL/PostgreSQL замість стандартного SQLite. Реалізація й тестування цим планом не розпочаті.
 - Нове пряме рішення користувача: **MLT-3 буде вебінтерфейсом і реалізовуватиметься останнім** (`decisions.md`, D-12). Конкретні web stack/API не обрані. Пропозиція щодо БД уточнена: окремий backend-пакет збереження результатів, запис після MLT-20, майбутній UI — споживач історії; реалізація можлива до UI, але ще не доручена.
